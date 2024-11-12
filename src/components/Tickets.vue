@@ -101,13 +101,8 @@
 
     <!-- Блок для таблицы -->
     <div class="table-container">
-      <form @submit.prevent="createTicket">
-        <h3>Create New Ticket</h3>
-        <input v-model="newTicket.name" placeholder="Name" required />
-        <input v-model.number="newTicket.price" placeholder="Price" required />
-        <input v-model.number="newTicket.discount" placeholder="Discount" required />
-        <button type="submit">Create Ticket</button>
-      </form>
+      <TicketForm @ticketCreated="createTicket"/>
+
       <h2>Tickets List</h2>
 
       <table v-if="tickets.length > 0" border="1" cellpadding="10" cellspacing="0">
@@ -161,8 +156,10 @@
 
 <script>
 import apiClient from '../api.js';
+import TicketForm from "@/components/TicketForm.vue";
 
 export default {
+  components: {TicketForm},
   data() {
     return {
       tickets: [],
@@ -223,15 +220,14 @@ export default {
             console.error("Error loading tickets:", error);
           });
     },
-    createTicket() {
-      apiClient.post('/TMA/api/v2/tickets', this.newTicket)
-          .then(() => {
-            this.newTicket = { name: '', price: 0, discount: 0 };
-            this.fetchTickets();
+    createTicket(ticket) {
+      apiClient.post('/TMA/api/v2/tickets', ticket)
+          .then(response => {
+            alert('Билет создан успешно!\n' + JSON.stringify(response.data));
           })
           .catch(error => {
             console.error("Error creating ticket:", error);
-          });
+            alert('Ошибка при создании билета!\n' + (new DOMParser()).parseFromString(error.response.data, 'text/xml').documentElement.outerHTML);          });
     },
     deleteTicket(id) {
       apiClient.delete(`/TMA/api/v2/tickets/${id}`)
@@ -272,8 +268,9 @@ export default {
 }
 
 table {
+  text-align: center;
   width: 100%;
-  border-collapse: collapse;
+  margin: auto;
 }
 
 th, td {
