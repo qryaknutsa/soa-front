@@ -3,39 +3,45 @@
     <h2>Create New Ticket</h2>
     <form @submit.prevent="createTicket">
       <div>
-        <label for="name">Name:</label>
+        <label for="name"><span class="required-asterisk">*</span>Название:</label>
         <input type="text" id="name" v-model="newTicket.name"/>
         <div v-if="errors.name" class="error">{{ errors.name }}</div>
       </div>
 
       <div>
-        <label for="price">Price:</label>
+        <label for="price"><span class="required-asterisk">*</span>Цена:</label>
         <input type="number" id="price" v-model="newTicket.price"/>
         <div v-if="errors.price" class="error">{{ errors.price }}</div>
       </div>
 
       <div>
-        <label for="discount">Discount:</label>
+        <label for="discount"><span class="required-asterisk">*</span>Скидка:</label>
         <input type="number" id="discount" v-model="newTicket.discount" step="any"/>
         <div v-if="errors.discount" class="error">{{ errors.discount }}</div>
       </div>
 
       <div>
-        <label for="refundable">Refundable:</label>
-        <input type="checkbox" id="refundable" v-model="newTicket.refundable"/>
+        <label for="refundableType">Возвратный:</label>
+        <select id="refundableType" v-model="refundableType">
+          <option value="ANY">Не выбрано</option>
+          <option value="TRUE">Да</option>
+          <option value="FALSE">Нет</option>
+        </select>
+        <!--        <input type="checkbox" id="refundable" v-model="newTicket.refundable"/>-->
       </div>
 
       <div>
-        <label for="type">Type:</label>
+        <label for="type">Тип:</label>
         <select id="type" v-model="newTicket.type">
-          <option value="CHEAP">Cheap</option>
-          <option value="BUDGETARY">Budgetary</option>
-          <option value="USUAL">Usual</option>
-          <option value="VIP">VIP</option>
+          <option value="ANY">Не выбрано</option>
+          <option value="CHEAP">Дешевый</option>
+          <option value="BUDGETARY">Бюджетный</option>
+          <option value="USUAL">Обычный</option>
+          <option value="VIP">Люкс</option>
         </select>
       </div>
 
-      <h3>Coordinates</h3>
+      <h3>Координаты</h3>
       <div>
         <label for="coordinatesX">X:</label>
         <input type="number" id="coordinatesX" v-model="newTicket.coordinates.x" step="any"/>
@@ -43,54 +49,56 @@
       </div>
 
       <div>
-        <label for="coordinatesY">Y:</label>
+        <label for="coordinatesY"><span class="required-asterisk">*</span>Y:</label>
         <input type="number" id="coordinatesY" v-model="newTicket.coordinates.y" step="any"/>
         <div v-if="errors.coordinatesY" class="error">{{ errors.coordinatesY }}</div>
       </div>
 
       <div>
-        <input type="checkbox" id="hasPerson" v-model="hasPerson"> Has Person
+        <input type="checkbox" id="hasPerson" style="margin-top: 20px" v-model="hasPerson"> Есть человек
         <div v-if="hasPerson">
-          <h3>Person</h3>
+          <h3>Человек</h3>
           <div>
-            <label for="personHeight">Height:</label>
+            <label for="personHeight"><span class="required-asterisk">*</span>Рост:</label>
             <input type="number" id="personHeight" v-model="newTicket.person.height"/>
-            <div v-if="errors.personHeight" class="error">{{ errors.personHeight }}</div>
+            <div v-if="errors.height" class="error">{{ errors.height }}</div>
           </div>
 
           <div>
-            <label for="personEyeColor">Eye Color:</label>
+            <label for="personEyeColor">Цвет глаз:</label>
             <select id="personEyeColor" v-model="newTicket.person.eyeColor">
-              <option value="GREEN">Green</option>
-              <option value="RED">Red</option>
-              <option value="BLUE">Blue</option>
+              <option value="ANY">Не выбрано</option>
+              <option value="GREEN">Зеленый</option>
+              <option value="RED">Красный</option>
+              <option value="BLUE">Синий</option>
             </select>
           </div>
 
           <div>
-            <label for="personHairColor">Hair Color:</label>
+            <label for="personHairColor"><span class="required-asterisk">*</span>Цвет волос:</label>
             <select id="personHairColor" v-model="newTicket.person.hairColor">
-              <option value="RED">Red</option>
-              <option value="BLACK">Black</option>
-              <option value="BLUE">Blue</option>
-              <option value="ORANGE">Orange</option>
-              <option value="WHITE">White</option>
+              <option value="RED">Красный</option>
+              <option value="BLACK">Черный</option>
+              <option value="BLUE">Синий</option>
+              <option value="ORANGE">Оранжевый</option>
+              <option value="WHITE">Белый</option>
             </select>
           </div>
 
           <div>
-            <label for="personNationality">Nationality:</label>
+            <label for="personNationality">Национальность:</label>
             <select id="personNationality" v-model="newTicket.person.nationality">
-              <option value="NORTH_KOREA">North Korea</option>
-              <option value="JAPAN">Japan</option>
-              <option value="CHINA">China</option>
+              <option value="ANY">Не выбрано</option>
+              <option value="NORTH_KOREA">Северная Корея</option>
+              <option value="JAPAN">Япония</option>
+              <option value="CHINA">Китай</option>
             </select>
           </div>
 
-          <h3>Location</h3>
+          <h3><span class="required-asterisk">*</span>Местоположение</h3>
 
           <div>
-            <label for="locationX">X:</label>
+            <label for="locationX"><span class="required-asterisk">*</span>X:</label>
             <input type="number" id="locationX" v-model="newTicket.person.location.x"/>
             <div v-if="errors.locationX" class="error">{{ errors.locationX }}</div>
           </div>
@@ -102,36 +110,38 @@
           </div>
 
           <div>
-            <label for="locationZ">Z:</label>
+            <label for="locationZ"><span class="required-asterisk">*</span>Z:</label>
             <input type="number" id="locationZ" v-model="newTicket.person.location.z" step="any"/>
             <div v-if="errors.locationZ" class="error">{{ errors.locationZ }}</div>
           </div>
 
           <div>
-            <label for="locationName">Name:</label>
+            <label for="locationName">Название:</label>
             <input type="text" id="locationName" v-model="newTicket.person.location.name"/>
           </div>
         </div>
       </div>
 
 
-      <button type="submit">Create Ticket</button>
+      <button style="margin-top: 20px" type="submit">Create Ticket</button>
     </form>
   </div>
 </template>
 
 <script>
-import apiClient from "@/api.js";
 
 export default {
   data() {
     return {
-      hasPerson: true,
-      hasRefundable: true,
-      hasType: true,
-      hasEyeColor: true,
-      hasCountry: true,
+      MAX_DOUBLE : Number.MAX_VALUE,
+      MIN_DOUBLE : -Number.MAX_VALUE,
+      MAX_INTEGER : 2147483647,
+      MIN_INTEGER : -2147483647,
+      MAX_LONG: Number.MAX_SAFE_INTEGER,
+      MIN_LONG: Number.MIN_SAFE_INTEGER,
 
+      hasPerson: true,
+      refundableType: 'ANY',
 
       newTicket: {
         name: '',
@@ -142,12 +152,12 @@ export default {
         price: 0,
         discount: 0,
         refundable: false,
-        type: '',
+        type: 'ANY',
         person: {
           height: 0,
-          eyeColor: '',
-          hairColor: '',
-          nationality: '',
+          eyeColor: 'ANY',
+          hairColor: 'RED',
+          nationality: 'ANY',
           location: {
             x: 0,
             y: 0,
@@ -163,42 +173,45 @@ export default {
     createTicket() {
       this.errors = {};
 
-      if (!this.newTicket.name) {
-        this.errors.name = 'Name is required';
-      }
+      !this.newTicket.name ? this.errors.name = 'Значение name не должно быть пустым' : null
 
-      if (this.newTicket.coordinates.x < -2147483648 || this.newTicket.coordinates.x > 2147483647) {
-        this.errors.coordinatesX = 'X must be between -2147483648 and 2147483647';
-      }
+      this.newTicket.coordinates.x < this.MIN_INTEGER ? this.errors.coordinatesX = `Значение coordinates.x не может быть меньше возможного ${this.MIN_INTEGER}` :
+          this.newTicket.coordinates.x > this.MAX_INTEGER ? this.errors.coordinatesX = `Значение coordinates.x не может быть больше возможного ${this.MAX_INTEGER}` : null
 
-      if (this.newTicket.coordinates.y < 1.4E-45 || this.newTicket.coordinates.y > 3.4028235E38) {
-        this.errors.coordinatesY = 'Y must be between 1.4E-45 and 3.4028235E38';
-      }
 
-      if (this.newTicket.price <= 0) {
-        this.errors.price = 'Price must be greater than 0';
-      }
+      this.newTicket.coordinates.y < this.MIN_DOUBLE ? this.errors.coordinatesY = `Значение coordinates.y не может быть меньше возможного ${this.MIN_DOUBLE}` :
+          this.newTicket.coordinates.y > this.MAX_DOUBLE ? this.errors.coordinatesY = `Значение coordinates.y не может быть больше возможного ${this.MAX_DOUBLE}` : null
 
-      if (this.newTicket.discount < 0 || this.newTicket.discount > 100) {
-        this.errors.discount = 'Discount must be between 0 and 100';
-      }
+      this.newTicket.price <= 0 ? this.errors.price = `Значение price не может быть меньше 1` :
+          this.newTicket.price > this.MAX_INTEGER ? this.errors.price = `Значение price не может быть больше возможного ${this.MAX_INTEGER}` : null
+
+
+      this.newTicket.discount < 0 ? this.errors.discount = `Значение discount не может быть меньше 0` :
+          this.newTicket.discount > 100 ? this.errors.discount = `Значение discount не может быть больше 100` : null
+
+
+      if(this.newTicket.type === 'ANY') this.newTicket.type=null
+
+      this.refundableType === 'ANY' ? this.newTicket.refundable=null :
+          this.refundableType === 'TRUE' ? this.newTicket.refundable=true :
+              this.refundableType === 'FALSE' ? this.newTicket.refundable=false : null
 
       if (this.hasPerson) {
-        if (this.newTicket.person.height < 50 || this.newTicket.person.height > 300) {
-          this.errors.personHeight = 'Height must be between 50 and 300';
-        }
+        this.newTicket.person.height <= 0 ? this.errors.height = `Значение person.height не может быть меньше 1` :
+            this.newTicket.person.height > 300 ? this.errors.height = `Значение person.height не может быть больше 300` : null
 
-        if (this.newTicket.person.location.x < -2147483648 || this.newTicket.person.location.x > 2147483647) {
-          this.errors.locationX = 'X must be between -2147483648 and 2147483647';
-        }
+        this.newTicket.person.location.x < this.MIN_INTEGER ? this.errors.locationX = `Значение location.x не может быть меньше возможного ${this.MIN_INTEGER}` :
+            this.newTicket.person.location.x > this.MAX_INTEGER ? this.errors.locationX = `Значение location.x не может быть больше возможного ${this.MAX_INTEGER}` : null
 
-        if (this.newTicket.person.location.y < -9223372036854775808 || this.newTicket.person.location.y > 9223372036854775807) {
-          this.errors.locationY = 'Y must be between -9223372036854775808 and 9223372036854775807';
-        }
 
-        if (this.newTicket.person.location.z < 4.9E-324 || this.newTicket.person.location.z > 1.7976931348623157E308) {
-          this.errors.locationZ = 'Z must be between 4.9E-324 and 1.7976931348623157E308';
-        }
+        this.newTicket.person.location.y < this.MIN_LONG ? this.errors.locationY = `Значение location.y не может быть меньше возможного ${this.MIN_LONG}` :
+            this.newTicket.person.location.y > this.MAX_LONG ? this.errors.locationY = `Значение location.y не может быть больше возможного ${this.MAX_LONG}` : null
+
+        this.newTicket.person.location.z < this.MIN_DOUBLE ? this.errors.locationZ = `Значение location.z не может быть меньше возможного ${this.MIN_DOUBLE}` :
+            this.newTicket.person.location.z > this.MAX_DOUBLE ? this.errors.locationZ = `Значение location.z не может быть больше возможного ${this.MAX_DOUBLE}` : null
+
+        if(this.newTicket.person.nationality === 'ANY') this.newTicket.person.nationality=null
+        if(this.newTicket.person.eyeColor === 'ANY') this.newTicket.person.eyeColor=null
 
       } else {
         this.newTicket.person = null
@@ -206,29 +219,29 @@ export default {
 
       if (Object.keys(this.errors).length === 0) {
         this.$emit('ticketCreated', this.newTicket);
-        this.newTicket = {
-          name: '',
-          coordinates: {
-            x: 0,
-            y: 0,
-          },
-          price: 0,
-          discount: 0,
-          refundable: false,
-          type: '',
-          person: {
-            height: 0,
-            eyeColor: '',
-            hairColor: '',
-            nationality: '',
-            location: {
-              x: 0,
-              y: 0,
-              z: 0,
-              name: '',
-            },
-          },
-        }
+        // this.newTicket = {
+        //   name: '',
+        //   coordinates: {
+        //     x: 0,
+        //     y: 0,
+        //   },
+        //   price: 0,
+        //   discount: 0,
+        //   refundable: false,
+        //   type: '',
+        //   person: {
+        //     height: 0,
+        //     eyeColor: '',
+        //     hairColor: '',
+        //     nationality: '',
+        //     location: {
+        //       x: 0,
+        //       y: 0,
+        //       z: 0,
+        //       name: '',
+        //     },
+        //   },
+        // }
       }
     },
   },
@@ -238,5 +251,11 @@ export default {
 <style scoped>
 .error {
   color: red;
+}
+
+/* styles.css */
+.required-asterisk {
+  color: red;
+  font-weight: bold;
 }
 </style>

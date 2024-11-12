@@ -27,9 +27,15 @@ import Tickets from '../components/Tickets.vue'; // Импортируем ко�
 
 const routes = [
     {
-        path: '/',
+        path: '/TMA/api/v2/tickets',
         name: 'Tickets',
-        component: Tickets // Устанавливаем Tickets как компонент по умолчанию
+        component: Tickets,
+        props: route => ({
+            pageSize: Number(route.query.size) || 10,
+            pageNumber: Number(route.query.page) || 1,
+            filter: route.query.filter || null,
+            sort: route.query.sort || null
+        })
     },
 ];
 
