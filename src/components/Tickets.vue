@@ -38,7 +38,6 @@
             <button @click="toggleFilter(field.name)">Filter</button>  <!-- Кнопка для фильтрации -->
             <button @click="toggleSort(field.name)">Sort</button>   <!-- Кнопка для сортировки -->
             <div v-if="isFilterVisible(field.name)" class="filter-popup">
-              <!-- Содержимое окна фильтрации -->
               <input v-if="field.type === 'string' || field.type === 'number'"
                      v-model="filterValues[field.name]"
                      :type="field.type"
@@ -67,18 +66,22 @@
                 <option value="JAPAN">Japan</option>
                 <option value="CHINA">China</option>
               </select>
-              <select v-else-if="field.type === 'boolean'" v-model="filterValues[field.name]">
-                <option :value="undefined">Any</option>
-                <option :value="true">True</option>
-                <option :value="false">False</option>
+              <select v-else-if="field.name === 'refundable'" v-model="filterValues[field.name]">
+                <option value="null">Не указано</option>
+                <option value="true">Да</option>
+                <option value="false">Нет</option>
               </select>
 
               <label>
                 Filter Type:
                 <select v-model="filterOperators[field.name]">
-                  <option value="=">Equal</option>
-                  <option value=">">Greater than</option>
-                  <option value="<">Less than</option>
+                  <option value="=">=</option>
+                  <option value="!=">!=</option>
+                  <option value=">">></option>
+                  <option value=">=">>=</option>
+                  <option value="<"><</option>
+                  <option value="<="><=</option>
+                  <option value="contains">Подстрока</option>
                 </select>
               </label>
               <button @click="applyFilter">Apply</button>
@@ -86,9 +89,9 @@
             <div v-if="isSortVisible(field.name)" class="sort-popup">
               <!-- Содержимое окна сортировки -->
               <select v-model="sortOptions[field.name]">
-                <option :value="undefined">No Sort</option>
-                <option value="asc">Ascending</option>
-                <option value="desc">Descending</option>
+                <option :value=undefined>Нет сортировки</option>
+                <option value="asc">По возрастанию</option>
+                <option value="desc">По убыванию</option>
               </select>
               <button @click="applySort">Apply</button>
             </div>
@@ -104,7 +107,7 @@
           <td>{{ ticket.coordinates.y }}</td>
           <td>{{ ticket.price }}</td>
           <td>{{ ticket.discount }}</td>
-          <td>{{ ticket.refundable ? 'Yes' : 'No' }}</td>
+          <td>{{ ticket.refundable ? "Да" : ticket.refundable===null ? "" : "Нет"}}</td>
           <td>{{ ticket.type }}</td>
           <td>
             <div v-if="ticket.person">{{ ticket.person.height }}</div>
@@ -157,34 +160,17 @@ import TicketForm from "@/components/TicketForm.vue";
 
 export default {
   components: {TicketForm},
-  props: {
-    pageSize: {
-      type: Number,
-      default: 10
-    },
-    pageNumber: {
-      type: Number,
-      default: 1
-    },
-    filter: {
-      type: String,
-      default: null
-    },
-    sort: {
-      type: String,
-      default: null
-    }
-  },
   data() {
     return {
-      MAX_DOUBLE : Number.MAX_VALUE,
-      MIN_DOUBLE : -Number.MAX_VALUE,
-      tickets: [],
-      newTicket: {name: '', price: 0, discount: 0},
       pageSize: 10,
       pageNumber: 1,
+      sort: 'id:asc',
+      filter: '',
+      MAX_DOUBLE: Number.MAX_VALUE,
+      MIN_DOUBLE: -Number.MAX_VALUE,
+      tickets: [],
       discounts: 0,
-      uniqueTypes : '',
+      uniqueTypes: '',
       fields: [
         {name: 'id', label: 'ID', type: 'number', isInteger: true},
         {name: 'name', label: 'Name', type: 'string'},
@@ -192,7 +178,7 @@ export default {
         {name: 'coordinates.y', label: 'Coordinates Y', type: 'number', isInteger: true},
         {name: 'price', label: 'Price', type: 'number'},
         {name: 'discount', label: 'Discount', type: 'number', isInteger: true},
-        {name: 'refundable', label: 'Refundable', type: 'boolean'},
+        {name: 'refundable', label: 'Refundable', type: 'enum'},
         {name: 'type', label: 'Ticket Type', type: 'enum'},
         {name: 'person.height', label: 'Person Height', type: 'number', isInteger: true},
         {name: 'person.eyeColor', label: 'Person Eye Color', type: 'enum'},
@@ -210,9 +196,35 @@ export default {
       visibleFilters: {}, // Объект для хранения видимости окон фильтрации
       visibleSorts: {}
     };
+
+  },
+  watch: {
+    // Следим за изменениями переменных и обновляем URL
+    pageSize: 'updateUrl',
+    pageNumber: 'updateUrl',
+    sort: 'updateUrl',
+    filter: 'updateUrl',
+  },
+  created() {
+    this.syncParamsWithUrl(this.$route.query);
   },
   methods: {
-
+    syncParamsWithUrl(query) {
+      this.pageSize = query.size ? parseInt(query.size, 10) : this.pageSize;
+      this.pageNumber = query.page ? parseInt(query.page, 10) : this.pageNumber;
+      this.sort = query.sort || this.sort;
+      this.filter = query.filter || this.filter;
+    },
+    updateUrl() {
+      this.$router.replace({
+        query: {
+          size: this.pageSize,
+          page: this.pageNumber,
+          sort: this.sort,
+          filter: this.filter,
+        },
+      });
+    },
 
     toggleFilter(fieldName) {
       this.visibleFilters[fieldName] = !this.visibleFilters[fieldName];
@@ -222,37 +234,56 @@ export default {
       this.visibleSorts[fieldName] = !this.visibleSorts[fieldName];
       this.visibleFilters[fieldName] = false;
     },
-
     isFilterVisible(fieldName) {
       return this.visibleFilters[fieldName];
     },
     isSortVisible(fieldName) {
       return this.visibleSorts[fieldName];
     },
-    // Методы applyFilter и applySort должны вызвать fetchTickets после применения фильтров/сортировки
     applyFilter() {
       this.fetchTickets();
-      // Закрываем все окна фильтрации после применения
       Object.keys(this.visibleFilters).forEach(key => this.visibleFilters[key] = false);
     },
     applySort() {
       this.fetchTickets();
-      // Закрываем все окна сортировки после применения
       Object.keys(this.visibleSorts).forEach(key => this.visibleSorts[key] = false);
     },
 
 
     fetchTickets() {
-      console.log(this.MAX_DOUBLE)
-      console.log(this.MIN_DOUBLE)
       const filterArray = [];
       const sortArray = [];
-      this.fields.forEach(field => {
-        if (this.filterValues[field.name]) {
-          console.log(`${field.name}${this.filterOperators[field.name] || '='}${this.filterValues[field.name]}`)
-        }
-      });
-      // Создание строк для параметров фильтрации и сортировки
+
+      if (this.sort !== "") {
+        const sortParams = this.sort.split(",")
+        sortParams.forEach(field => {
+          let sortParam = field.split(":")
+          let operator
+          sortParam[1] === "desc" ? operator = "desc" : operator = "asc"
+          this.sortOptions[sortParam[0]] = operator
+        })
+      }
+      if (this.filter !== "") {
+        const filterParams = this.filter.split(",")
+        filterParams.forEach(field => {
+          let operator = ""
+
+          if (field.includes(">=")) operator = ">="
+          else if (field.includes("<=")) operator = "<="
+          else if (field.includes(">")) operator = ">"
+          else if (field.includes("<")) operator = "<"
+          else if (field.includes("!=")) operator = "!="
+          else if (field.includes("=")) operator = "="
+          else if (field.includes("contains")) operator = "contains"
+
+          let filterParams = field.split(operator)
+          this.filterOperators[filterParams[0].trim()] = operator
+          this.filterValues[filterParams[0].trim()] = filterParams[1]
+          console.log(filterParams)
+        })
+
+      }
+
       this.fields.forEach(field => {
         if (this.filterValues[field.name]) {
           filterArray.push(`${field.name}${this.filterOperators[field.name] || '='}${this.filterValues[field.name]}`);
@@ -261,7 +292,6 @@ export default {
           sortArray.push(`${field.name}:${this.sortOptions[field.name]}`);
         }
       });
-
       const params = {
         size: this.pageSize,
         page: this.pageNumber,
@@ -269,6 +299,15 @@ export default {
         filter: filterArray.join(',') || undefined,
       };
 
+      this.sort = sortArray.join(',')
+      this.filter = filterArray.join(',')
+
+
+      this.getTickets(params)
+
+    },
+
+    getTickets(params) {
       apiClient.get('/TMA/api/v2/tickets', {params})
           .then(response => {
             this.tickets = response.data;
@@ -277,6 +316,7 @@ export default {
             console.error("Error loading tickets:", error);
           });
     },
+
 
     getDiscounts() {
       apiClient.get('/TMA/api/v2/tickets/discounts')
@@ -367,6 +407,7 @@ export default {
   min-height: 25px;
   padding: 5px;
 }
+
 .table-container {
   flex: 2 0 700px; /* Table will take 2 parts of the space, won't shrink below 700px */
 }
