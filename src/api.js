@@ -2,21 +2,38 @@
 
 import axios from 'axios';
 
-const apiClient = axios.create({
-    baseURL: 'http://localhost:8080/ticketservicepayara', // Замените на актуальный URL вашего API
+const ticketApiClient = axios.create({
+    baseURL: 'http://localhost:8080/ticketservicepayara',
     headers: {
         'Content-Type': 'application/json',
     },
-    timeout: 10000, // Тайм-аут на случай зависания запросов (10 секунд)
+    timeout: 10000,
 });
 
-// Обработка ошибок
-apiClient.interceptors.response.use(
-    response => response, // Возвращаем ответ, если все хорошо
+const bookingApiClient = axios.create({
+    baseURL: 'http://localhost:8080/bookingServicePayara',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    timeout: 10000,
+});
+
+
+
+ticketApiClient.interceptors.response.use(
+    response => response,
     error => {
         console.error('API Error:', error);
         return Promise.reject(error);
     }
 );
 
-export default apiClient;
+bookingApiClient.interceptors.response.use(
+    response => response,
+    error => {
+        console.error('API Error:', error);
+        return Promise.reject(error);
+    }
+);
+
+export default {ticketApiClient, bookingApiClient};

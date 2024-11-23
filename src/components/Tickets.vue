@@ -1,8 +1,5 @@
 <template>
   <div class="container">
-
-
-    <!-- Блок для таблицы -->
     <div class="table-container">
       <TicketForm @ticketCreated="createTicket"/>
       <div style="margin-top: 20px;" class="pagination-controls">
@@ -35,8 +32,8 @@
         <tr>
           <th v-for="field in fields" :key="field.name">
             {{ field.label }}
-            <button @click="toggleFilter(field.name)">Filter</button>  <!-- Кнопка для фильтрации -->
-            <button @click="toggleSort(field.name)">Sort</button>   <!-- Кнопка для сортировки -->
+            <button @click="toggleFilter(field.name)">Filter</button>
+            <button @click="toggleSort(field.name)">Sort</button>
             <div v-if="isFilterVisible(field.name)" class="filter-popup">
               <input v-if="field.type === 'string' || field.type === 'number'"
                      v-model="filterValues[field.name]"
@@ -155,7 +152,7 @@
 </template>
 
 <script>
-import apiClient from '../api.js';
+import api from '../api.js';
 import TicketForm from "@/components/TicketForm.vue";
 
 export default {
@@ -164,8 +161,6 @@ export default {
     return {
       pageSize: 10,
       pageNumber: 1,
-      sort: 'id:asc',
-      filter: '',
       MAX_DOUBLE: Number.MAX_VALUE,
       MIN_DOUBLE: -Number.MAX_VALUE,
       tickets: [],
@@ -199,33 +194,10 @@ export default {
 
   },
   watch: {
-    // Следим за изменениями переменных и обновляем URL
-    pageSize: 'updateUrl',
-    pageNumber: 'updateUrl',
-    sort: 'updateUrl',
-    filter: 'updateUrl',
   },
   created() {
-    this.syncParamsWithUrl(this.$route.query);
   },
   methods: {
-    syncParamsWithUrl(query) {
-      this.pageSize = query.size ? parseInt(query.size, 10) : this.pageSize;
-      this.pageNumber = query.page ? parseInt(query.page, 10) : this.pageNumber;
-      this.sort = query.sort || this.sort;
-      this.filter = query.filter || this.filter;
-    },
-    updateUrl() {
-      this.$router.replace({
-        query: {
-          size: this.pageSize,
-          page: this.pageNumber,
-          sort: this.sort,
-          filter: this.filter,
-        },
-      });
-    },
-
     toggleFilter(fieldName) {
       this.visibleFilters[fieldName] = !this.visibleFilters[fieldName];
       this.visibleSorts[fieldName] = false;
@@ -254,39 +226,9 @@ export default {
       const filterArray = [];
       const sortArray = [];
 
-      if (this.sort !== "") {
-        const sortParams = this.sort.split(",")
-        sortParams.forEach(field => {
-          let sortParam = field.split(":")
-          let operator
-          sortParam[1] === "desc" ? operator = "desc" : operator = "asc"
-          this.sortOptions[sortParam[0]] = operator
-        })
-      }
-      if (this.filter !== "") {
-        const filterParams = this.filter.split(",")
-        filterParams.forEach(field => {
-          let operator = ""
-
-          if (field.includes(">=")) operator = ">="
-          else if (field.includes("<=")) operator = "<="
-          else if (field.includes(">")) operator = ">"
-          else if (field.includes("<")) operator = "<"
-          else if (field.includes("!=")) operator = "!="
-          else if (field.includes("=")) operator = "="
-          else if (field.includes("contains")) operator = "contains"
-
-          let filterParams = field.split(operator)
-          this.filterOperators[filterParams[0].trim()] = operator
-          this.filterValues[filterParams[0].trim()] = filterParams[1]
-          console.log(filterParams)
-        })
-
-      }
-
       this.fields.forEach(field => {
         if (this.filterValues[field.name]) {
-          filterArray.push(`${field.name}${this.filterOperators[field.name] || '='}${this.filterValues[field.name]}`);
+          filterArray.push(`${field.name}${this.filterOperators[field.name]}${this.filterValues[field.name]}`);
         }
         if (this.sortOptions[field.name]) {
           sortArray.push(`${field.name}:${this.sortOptions[field.name]}`);
@@ -299,16 +241,14 @@ export default {
         filter: filterArray.join(',') || undefined,
       };
 
-      this.sort = sortArray.join(',')
-      this.filter = filterArray.join(',')
-
+      console.log(filterArray.join(','))
 
       this.getTickets(params)
 
     },
 
     getTickets(params) {
-      apiClient.get('/TMA/api/v2/tickets', {params})
+      api.ticketApiClient.get('/TMA/api/v2/tickets', {params})
           .then(response => {
             this.tickets = response.data;
           })
@@ -319,7 +259,7 @@ export default {
 
 
     getDiscounts() {
-      apiClient.get('/TMA/api/v2/tickets/discounts')
+      api.ticketApiClient.get('/TMA/api/v2/tickets/discounts')
           .then(response => {
             this.discounts = response.data;
           })
@@ -329,7 +269,7 @@ export default {
     },
 
     getUniqueTypes() {
-      apiClient.get('/TMA/api/v2/tickets/types/unique')
+      api.ticketApiClient.get('/TMA/api/v2/tickets/types/unique')
           .then(response => {
             this.uniqueTypes = response.data;
           })
@@ -338,7 +278,7 @@ export default {
           });
     },
     createTicket(ticket) {
-      apiClient.post('/TMA/api/v2/tickets', ticket)
+      api.ticketApiClient.post('/TMA/api/v2/tickets', ticket)
           .then(response => {
             alert('Билет создан успешно!\n' + JSON.stringify(response.data));
             this.fetchTickets()
@@ -349,7 +289,7 @@ export default {
           });
     },
     deleteTicket(id) {
-      apiClient.delete(`/TMA/api/v2/tickets/${id}`)
+      api.ticketApiClient.delete(`/TMA/api/v2/tickets/${id}`)
           .then(() => {
             this.fetchTickets();
           })
@@ -359,7 +299,7 @@ export default {
     },
     updateTicket(id) {
       const updatedTicket = {name: 'Updated Name', price: 123, discount: 10};
-      apiClient.patch(`/TMA/api/v2/tickets/${id}`, updatedTicket)
+      api.ticketApiClient.patch(`/TMA/api/v2/tickets/${id}`, updatedTicket)
           .then(() => {
             this.fetchTickets();
           })

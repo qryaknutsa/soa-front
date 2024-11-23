@@ -23,11 +23,12 @@
 // src/router/index.js
 
 import { createRouter, createWebHistory } from 'vue-router';
-import Tickets from '../components/Tickets.vue'; // Импортируем компонент Tickets
+import Tickets from '../components/Tickets.vue';
+import Events from '../components/Events.vue';
 
 const routes = [
     {
-        path: '/TMA/api/v2/tickets',
+        path: '/',
         name: 'Tickets',
         component: Tickets,
         props: route => ({
@@ -37,6 +38,11 @@ const routes = [
             sort: route.query.sort || null
         })
     },
+    {
+        path: '/events',
+        name: 'Events',
+        component: Events
+    }
 ];
 
 const router = createRouter({

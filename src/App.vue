@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <h1>Welcome to the Tickets App</h1>
-    <router-view /> <!-- Маршрутизатор будет отображать здесь компонент Tickets -->
+    <router-view />
   </div>
 </template>
 
