@@ -1,7 +1,7 @@
 <template>
   <div v-if="isModalOpen" class="modal-overlay" @click.self="closeModal">
     <div class="modal-content">
-      <h2>Create New Ticket</h2>
+      <h2>Создать билет</h2>
       <form @submit.prevent="createTicket">
         <div>
           <label for="name"><span class="required-asterisk">*</span>Название:</label>
@@ -124,7 +124,7 @@
         </div>
 
 
-        <button style="margin-top: 20px" type="submit">Create Ticket</button>
+        <button style="margin-top: 20px" type="submit">Создать</button>
       </form>
     </div>
   </div>
@@ -242,7 +242,6 @@ export default {
   color: red;
 }
 
-/* styles.css */
 .required-asterisk {
   color: red;
   font-weight: bold;

@@ -1,9 +1,29 @@
 <template>
-  <div class="ticket" v-if="ticket">
+  <div class="ticket">
     <div class="ticket-details">
       <div class="ticket-card">
-        <h2>Информация о билете</h2>
-        <div class="ticket-info">
+        <h2>Сервис бронирования</h2>
+        <div>
+          <button class="btn" @click="toBooking">Перейти к сервису бронирования</button>
+        </div>
+
+
+        <h2>Найти билет:</h2>
+        <div>
+          <label for="ticket_id">ID билета:</label>
+          <input type="number" id="ticket_id" v-model="ticket_id"/>
+          <div v-if="errors.ticket_id" class="error">{{ errors.ticket_id }}</div>
+        </div>
+        <div>
+          <label for="person_id">ID владельца:</label>
+          <input type="number" id="person_id" v-model="person_id"/>
+          <div v-if="errors.person_id" class="error">{{ errors.person_id }}</div>
+        </div>
+        <button @click="getTicket">Cоздать</button>
+
+
+        <div v-if="ticket" class="ticket-info">
+          <h2>Информация о билете</h2>
           <p><strong>ID:</strong> <span>{{ ticket.id }}</span></p>
           <p><strong>Имя:</strong> <span>{{ ticket.name }}</span></p>
           <p><strong>Цена:</strong> <span>{{ ticket.price }}</span></p>
@@ -14,7 +34,7 @@
             <span>{{ ticket.refundable ? "Да" : ticket.refundable === null ? "Не уточнено" : "Нет" }}</span>
           </p>
         </div>
-        <div v-if="ticket.person" class="person-info">
+        <div v-if="ticket" class="person-info">
           <h3>Информация о владельце</h3>
           <ul>
             <li><strong>Рост:</strong> {{ ticket.person.height }}</li>
@@ -22,64 +42,37 @@
             <li><strong>Цвет волос:</strong> {{ ticket.person.hairColor }}</li>
             <li><strong>Национальность:</strong> {{ ticket.person.nationality }}</li>
             <li><strong>Имя локации:</strong>{{ ticket.person.location.name }}</li>
-            <li><strong>Координаты локации:</strong> (<span>{{ ticket.person.location.x }}, {{ ticket.person.location.y }}, {{ ticket.person.location.z }}</span>)
+            <li><strong>Координаты локации:</strong> (<span>{{ ticket.person.location.x }}, {{
+                ticket.person.location.y
+              }}, {{ ticket.person.location.z }}</span>)
             </li>
           </ul>
-        </div>
-
-        <div v-else class="no-person-info">
-          <h3>Информация о владельце</h3>
-          <p>Владельца нет.</p>
         </div>
       </div>
     </div>
     <div class="ticket-actions">
-      <button @click="deleteTicket">Удалить</button>
-      <button class="btn" @click="openModal">Обновить</button>
-
-      <TicketUpdateForm
-          :isModalOpen="isModalOpen"
-          @closeModal="closeModal"
-          @ticketCreated="updateTicket"
-      />
-
-
+      <!--      <button @click="deleteTicket">Удалить</button>-->
     </div>
   </div>
-  <div v-else>Loading...</div>
 </template>
 
 <script>
 import api from "@/api.js";
-import TicketUpdateForm from "@/components/TicketUpdateForm.vue";
 
 export default {
   name: "Ticket",
-  components: {TicketUpdateForm},
-  props: {
-    id: {
-      type: String,
-      required: true,
-    },
-  },
   data() {
     return {
       isModalOpen: false,
       ticket: null,
+      ticket_id: 0,
+      person_id: 0,
+      errors: {}
     };
   },
-  created() {
-    this.getTicket();
-  },
   methods: {
-    openModal() {
-      this.isModalOpen = true;
-    },
-    closeModal() {
-      this.isModalOpen = false;
-    },
     getTicket() {
-      api.ticketApiClient.get(`/TMA/api/v2/tickets/${this.id}`)
+      api.bookingApiClient.post(`/TMA/api/v2/booking/sell/vip/${this.ticket_id}/${this.person_id}`)
           .then(response => {
             this.ticket = response.data;
           })
@@ -87,28 +80,10 @@ export default {
             console.error("Error fetching ticket:", error);
           });
     },
-    deleteTicket() {
-      api.ticketApiClient.delete(`/TMA/api/v2/tickets/${this.id}`)
-          .then(() => {
-            alert("Билет удалён!");
-            this.$router.push('/');
-          })
-          .catch(error => {
-            console.error("Error deleting ticket:", error);
-          });
+    toBooking(){
+      this.$router.push('/TMA/api/v2/booking');
+    },
 
-    },
-    updateTicket(ticket) {
-      api.ticketApiClient.patch(`/TMA/api/v2/tickets/${this.id}`, ticket)
-          .then(() => {
-            alert("Ticket updated!");
-            this.getTicket(); // Обновление данных
-          })
-          .catch(error => {
-            console.error("Error updating ticket:", error);
-          });
-      this.getTicket();
-    },
   },
 };
 </script>
@@ -187,11 +162,6 @@ export default {
   font-weight: bold;
 }
 
-.no-person-info {
-  margin-top: 20px;
-  font-size: 16px;
-  color: #999;
-}
 
 .no-person-info p {
   font-style: italic;

@@ -1,10 +1,16 @@
 <template>
   <div class="container">
     <div class="table-container">
-      <!--      <TicketForm @ticketCreated="createTicket"/>-->
+      <h1>Сервис управления билетами</h1>
+
+      <h2>Сервис бронирования</h2>
+      <div>
+        <button class="btn" @click="toBooking">Перейти к сервису бронирования</button>
+      </div>
+
 
       <h2>Создание билета</h2>
-      <button class="btn" @click="openModal">Create Ticket</button>
+      <button class="btn" @click="openModal">Создать</button>
 
       <TicketForm
           :isModalOpen="isModalOpen"
@@ -42,7 +48,7 @@
           Номер страницы:
           <input type="number" style="width: 50px" v-model.number="pageNumber" min="1"/>
         </label>
-        <button class="btn" @click="fetchTickets">Показать билеты</button>
+        <button class="btn" @click="fetchTickets">Загрузить</button>
       </div>
 
       <table border="1" cellpadding="10" cellspacing="0">
@@ -126,40 +132,35 @@
           <td>{{ ticket.refundable ? "Да" : ticket.refundable === null ? "" : "Нет" }}</td>
           <td>{{ ticket.type }}</td>
           <td>
+            <div v-if="ticket.person">{{ ticket.person.id }}</div>
+          </td>
+          <td>
             <div v-if="ticket.person">{{ ticket.person.height }}</div>
-            <div v-else>-</div>
           </td>
           <td>
             <div v-if="ticket.person">{{ ticket.person.eyeColor }}</div>
-            <div v-else>-</div>
           </td>
           <td>
             <div v-if="ticket.person">{{ ticket.person.hairColor }}</div>
-            <div v-else>-</div>
           </td>
           <td>
             <div v-if="ticket.person">{{ ticket.person.nationality }}</div>
-            <div v-else>-</div>
           </td>
           <td>
             <div v-if="ticket.person">{{ ticket.person.location.x }}</div>
-            <div v-else>-</div>
           </td>
           <td>
             <div v-if="ticket.person">{{ ticket.person.location.y }}</div>
-            <div v-else>-</div>
           </td>
           <td>
             <div v-if="ticket.person">{{ ticket.person.location.z }}</div>
-            <div v-else>-</div>
           </td>
           <td>
             <div v-if="ticket.person">{{ ticket.person.location.name }}</div>
-            <div v-else>-</div>
           </td>
           <td>{{ ticket.creationDate }}</td>
           <td>
-            <router-link :to="{ name: 'Ticket', params: { id: ticket.id } }">View</router-link>
+            <router-link :to="{ name: 'Ticket', params: { id: ticket.id } }">Перейти</router-link>
           </td>
         </tr>
         </tbody>
@@ -197,6 +198,7 @@ export default {
         {name: 'discount', label: 'Discount', type: 'number', isInteger: true},
         {name: 'refundable', label: 'Refundable', type: 'enum'},
         {name: 'type', label: 'Ticket Type', type: 'enum'},
+        {name: 'person.id', label: 'Person ID', type: 'number', isInteger: true},
         {name: 'person.height', label: 'Person Height', type: 'number', isInteger: true},
         {name: 'person.eyeColor', label: 'Person Eye Color', type: 'enum'},
         {name: 'person.hairColor', label: 'Person Hair Color', type: 'enum'},
@@ -286,7 +288,6 @@ export default {
             else {
               const resp = this.handleError(error)
               alert('Ошибка загрузки билетов!\n' + resp);
-              // console.error("Error loading tickets:", error);
             }
           });
     },
@@ -298,6 +299,11 @@ export default {
     getUniqueTypes() {
       this.$router.push('/TMA/api/v2/tickets/types/unique');
     },
+
+    toBooking(){
+      this.$router.push('/TMA/api/v2/booking');
+    },
+
     getLessThanType() {
       try {
         this.$router.push({name: 'LessThanType', params: {lessType: this.lessType}});
@@ -305,7 +311,6 @@ export default {
         console.log(error.message)
         if (error.message === 'Missing required param "lessType"')
           alert('Заполните выбор типа билета!');
-        // this.$store.dispatch('triggerError', 'Заполните выбор типа');
       }
 
 
@@ -324,14 +329,11 @@ export default {
     },
     handleError(error) {
       if (error.response) {
-        // Если ошибка пришла с сервера
         const errorData = error.response.data;
         const errorTitle = errorData.title;
         const errorDetail = errorData.detail;
-        // Показать ошибку пользователю
         return `${errorTitle}\n${errorDetail}`
       } else {
-        // Если ошибка произошла на клиенте
         console.error(error);
         return 'Произошла ошибка. Пожалуйста, попробуйте позже.';
       }

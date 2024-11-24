@@ -1,36 +1,13 @@
-// // src/router/index.js
-//
-// import { createRouter, createWebHistory } from 'vue-router'
-// import Tickets from '../components/Tickets.vue' // Импортируем компонент Tickets
-//
-// const routes = [
-//     {
-//         path: '/',
-//         name: 'Tickets',
-//         component: Tickets // Устанавливаем Tickets как компонент по умолчанию
-//     },
-//     // Добавьте другие маршруты, если необходимо
-// ]
-//
-// const router = createRouter({
-//     history: createWebHistory(process.env.BASE_URL),
-//     routes
-// })
-//
-// export default router
-
-
-// src/router/index.js
-
 import { createRouter, createWebHistory } from 'vue-router';
 import Tickets from '../components/TicketTable.vue';
 import Ticket from '../components/Ticket.vue';
-import Events from '../components/Events.vue';
+import Events from '../components/EventTable.vue';
+import Event from '../components/Event.vue';
 import DiscountsPage from '../components/DiscountsPage.vue';
 import UniqueTypesPage from '../components/UniqueTypesPage.vue';
 import LessThanType from '../components/LessThanType.vue';
 import NotFound from '../components/NotFound.vue'
-
+import CopyTicketToVip from '../components/CopyTicketToVip.vue'
 
 const routes = [
     {
@@ -50,7 +27,7 @@ const routes = [
     },
     {
         path: '/TMA/api/v2/booking',
-        name: 'Events',
+        name: 'EventTable',
         component: Events
     },
     {
@@ -60,8 +37,18 @@ const routes = [
         props: true
     },
     {
+        path: '/TMA/api/v2/booking/event/:id',
+        name: 'Event',
+        component: Event,
+        props: true
+    },
+    {
         path: '/TMA/api/v2/tickets/discounts',
         component: DiscountsPage,
+    },
+    {
+        path: '/TMA/api/v2/booking/sell/vip',
+        component: CopyTicketToVip
     },
     {
         path: '/TMA/api/v2/tickets/types/unique',
