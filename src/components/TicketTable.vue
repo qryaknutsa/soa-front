@@ -1,33 +1,51 @@
 <template>
   <div class="container">
     <div class="table-container">
-      <TicketForm @ticketCreated="createTicket"/>
+      <!--      <TicketForm @ticketCreated="createTicket"/>-->
+
+      <h2>Создание билета</h2>
+      <button class="btn" @click="openModal">Create Ticket</button>
+
+      <TicketForm
+          :isModalOpen="isModalOpen"
+          @closeModal="closeModal"
+          @ticketCreated="createTicket"
+      />
+
+
+      <h2>Дополнительные операции</h2>
+      <div>
+        <button class="btn" @click="getUniqueTypes">Получить уникальные типы билетов</button>
+      </div>
+      <div>
+        <button class="btn" @click="getDiscounts">Получить все скидки</button>
+      </div>
+
+      <div>
+        <label for="type">Тип:</label>
+        <select id="type" v-model="lessType">
+          <option value="CHEAP" selected>Дешевый</option>
+          <option value="BUDGETARY">Бюджетный</option>
+          <option value="USUAL">Обычный</option>
+          <option value="VIP">VIP</option>
+        </select>
+        <button class="btn" @click="getLessThanType">Кол-во билетов с меньшим типом</button>
+      </div>
+
+      <h2>Список билетов</h2>
       <div style="margin-top: 20px;" class="pagination-controls">
         <label>
-          Page Size:
+          Размер страницы:
           <input type="number" style="width: 50px" v-model.number="pageSize" min="1"/>
         </label>
         <label>
-          Page Number:
+          Номер страницы:
           <input type="number" style="width: 50px" v-model.number="pageNumber" min="1"/>
         </label>
-        <label>
-          Все скидки
-          <input readonly style="width: 50px" v-model.number="discounts"/>
-        </label>
-        <label>
-          Уникальные типы билетов
-          <textarea readonly v-model="uniqueTypes"/>
-        </label>
+        <button class="btn" @click="fetchTickets">Показать билеты</button>
       </div>
-      <div>
-        <button class="btn" @click="fetchTickets">Show tickets</button>
-        <button class="btn" @click="getDiscounts">Получить все скидки</button>
-        <button class="btn" @click="getUniqueTypes">Получить уникальные типы билетов</button>
-      </div>
-      <h2>Tickets List</h2>
 
-      <table v-if="tickets.length > 0" border="1" cellpadding="10" cellspacing="0">
+      <table border="1" cellpadding="10" cellspacing="0">
         <thead>
         <tr>
           <th v-for="field in fields" :key="field.name">
@@ -41,30 +59,30 @@
                      :step="field.isInteger ? 1 : 'any'"
                      placeholder="Filter value"/>
               <select v-else-if="field.name === 'type'" v-model="filterValues[field.name]">
-                <option value="CHEAP">Cheap</option>
+                <option value="CHEAP" selected>Cheap</option>
                 <option value="BUDGETARY">Budgetary</option>
                 <option value="USUAL">Usual</option>
                 <option value="VIP">VIP</option>
               </select>
               <select v-else-if="field.name === 'person.eyeColor'" v-model="filterValues[field.name]">
-                <option value="GREEN">Green</option>
+                <option value="GREEN" selected>Green</option>
                 <option value="RED">Red</option>
                 <option value="BLUE">Blue</option>
               </select>
               <select v-else-if="field.name === 'person.hairColor'" v-model="filterValues[field.name]">
-                <option value="RED">Red</option>
+                <option value="RED" selected>Red</option>
                 <option value="BLACK">Black</option>
                 <option value="BLUE">Blue</option>
                 <option value="ORANGE">Orange</option>
                 <option value="WHITE">White</option>
               </select>
               <select v-else-if="field.name === 'person.nationality'" v-model="filterValues[field.name]">
-                <option value="NORTH_KOREA">North Korea</option>
+                <option value="NORTH_KOREA" selected>North Korea</option>
                 <option value="JAPAN">Japan</option>
                 <option value="CHINA">China</option>
               </select>
               <select v-else-if="field.name === 'refundable'" v-model="filterValues[field.name]">
-                <option value="null">Не указано</option>
+                <option value="null" selected>Не указано</option>
                 <option value="true">Да</option>
                 <option value="false">Нет</option>
               </select>
@@ -72,6 +90,7 @@
               <label>
                 Filter Type:
                 <select v-model="filterOperators[field.name]">
+                  <option value=null>Нет фильтрации</option>
                   <option value="=">=</option>
                   <option value="!=">!=</option>
                   <option value=">">></option>
@@ -86,7 +105,7 @@
             <div v-if="isSortVisible(field.name)" class="sort-popup">
               <!-- Содержимое окна сортировки -->
               <select v-model="sortOptions[field.name]">
-                <option :value=undefined>Нет сортировки</option>
+                <option value=null :selected="true">Нет сортировки</option>
                 <option value="asc">По возрастанию</option>
                 <option value="desc">По убыванию</option>
               </select>
@@ -104,7 +123,7 @@
           <td>{{ ticket.coordinates.y }}</td>
           <td>{{ ticket.price }}</td>
           <td>{{ ticket.discount }}</td>
-          <td>{{ ticket.refundable ? "Да" : ticket.refundable===null ? "" : "Нет"}}</td>
+          <td>{{ ticket.refundable ? "Да" : ticket.refundable === null ? "" : "Нет" }}</td>
           <td>{{ ticket.type }}</td>
           <td>
             <div v-if="ticket.person">{{ ticket.person.height }}</div>
@@ -140,13 +159,12 @@
           </td>
           <td>{{ ticket.creationDate }}</td>
           <td>
-            <button @click="deleteTicket(ticket.id)">Delete</button>
-            <button @click="updateTicket(ticket.id)">Update</button>
+            <router-link :to="{ name: 'Ticket', params: { id: ticket.id } }">View</router-link>
           </td>
         </tr>
         </tbody>
       </table>
-      <p v-else>No tickets available.</p>
+
     </div>
   </div>
 </template>
@@ -154,11 +172,15 @@
 <script>
 import api from '../api.js';
 import TicketForm from "@/components/TicketForm.vue";
+import LessThanType from "@/components/LessThanType.vue";
+
 
 export default {
-  components: {TicketForm},
+  components: {TicketForm, LessThanType},
   data() {
     return {
+      lessType: 'CHEAP',
+      isModalOpen: false,
       pageSize: 10,
       pageNumber: 1,
       MAX_DOUBLE: Number.MAX_VALUE,
@@ -185,19 +207,29 @@ export default {
         {name: 'person.location.name', label: 'Location Name', type: 'string'},
         {name: 'creationDate', label: 'Creation Date', type: 'string'},
       ],
-      sortOptions: {},              // Параметры сортировки для каждого поля
-      filterOperators: {},          // Тип фильтра для каждого поля
-      filterValues: {},             // Значения фильтрации для каждого поля
-      visibleFilters: {}, // Объект для хранения видимости окон фильтрации
+      sortOptions: {},
+      filterOperators: {},
+      filterValues: {},
+      visibleFilters: {},
       visibleSorts: {}
     };
 
   },
-  watch: {
-  },
+  watch: {},
   created() {
+    this.fields.forEach(field => {
+      this.filterOperators[field.name] = null
+      this.sortOptions[field.name] = null
+    });
+    this.fetchTickets()
   },
   methods: {
+    openModal() {
+      this.isModalOpen = true;
+    },
+    closeModal() {
+      this.isModalOpen = false;
+    },
     toggleFilter(fieldName) {
       this.visibleFilters[fieldName] = !this.visibleFilters[fieldName];
       this.visibleSorts[fieldName] = false;
@@ -227,7 +259,7 @@ export default {
       const sortArray = [];
 
       this.fields.forEach(field => {
-        if (this.filterValues[field.name]) {
+        if (this.filterOperators[field.name] !== null && this.filterOperators[field.name] !== 'null' && this.filterValues[field.name] !== undefined) {
           filterArray.push(`${field.name}${this.filterOperators[field.name]}${this.filterValues[field.name]}`);
         }
         if (this.sortOptions[field.name]) {
@@ -237,14 +269,10 @@ export default {
       const params = {
         size: this.pageSize,
         page: this.pageNumber,
-        sort: sortArray.join(',') || undefined,
-        filter: filterArray.join(',') || undefined,
+        sort: sortArray.join(',') || "",
+        filter: filterArray.join(',') || "",
       };
-
-      console.log(filterArray.join(','))
-
       this.getTickets(params)
-
     },
 
     getTickets(params) {
@@ -253,58 +281,45 @@ export default {
             this.tickets = response.data;
           })
           .catch(error => {
-            console.error("Error loading tickets:", error);
+
+            if (error.status === 404) this.tickets = []
+            else {
+              const resp = this.handleError(error)
+              alert('Ошибка загрузки билетов!\n' + resp);
+              // console.error("Error loading tickets:", error);
+            }
           });
     },
 
 
     getDiscounts() {
-      api.ticketApiClient.get('/TMA/api/v2/tickets/discounts')
-          .then(response => {
-            this.discounts = response.data;
-          })
-          .catch(error => {
-            console.error("Error loading tickets:", error);
-          });
+      this.$router.push('/TMA/api/v2/tickets/discounts');
+    },
+    getUniqueTypes() {
+      this.$router.push('/TMA/api/v2/tickets/types/unique');
+    },
+    getLessThanType() {
+      try {
+        this.$router.push({name: 'LessThanType', params: {lessType: this.lessType}});
+      } catch (error) {
+        console.log(error.message)
+        if (error.message === 'Missing required param "lessType"')
+          alert('Заполните выбор типа билета!');
+        // this.$store.dispatch('triggerError', 'Заполните выбор типа');
+      }
+
+
     },
 
-    getUniqueTypes() {
-      api.ticketApiClient.get('/TMA/api/v2/tickets/types/unique')
-          .then(response => {
-            this.uniqueTypes = response.data;
-          })
-          .catch(error => {
-            console.error("Error loading tickets:", error);
-          });
-    },
     createTicket(ticket) {
       api.ticketApiClient.post('/TMA/api/v2/tickets', ticket)
           .then(response => {
-            alert('Билет создан успешно!\n' + JSON.stringify(response.data));
+            alert('Билет создан успешно!\n');
             this.fetchTickets()
           })
           .catch(error => {
             const resp = this.handleError(error)
             alert('Ошибка при создании билета!\n' + resp);
-          });
-    },
-    deleteTicket(id) {
-      api.ticketApiClient.delete(`/TMA/api/v2/tickets/${id}`)
-          .then(() => {
-            this.fetchTickets();
-          })
-          .catch(error => {
-            console.error("Error deleting ticket:", error);
-          });
-    },
-    updateTicket(id) {
-      const updatedTicket = {name: 'Updated Name', price: 123, discount: 10};
-      api.ticketApiClient.patch(`/TMA/api/v2/tickets/${id}`, updatedTicket)
-          .then(() => {
-            this.fetchTickets();
-          })
-          .catch(error => {
-            console.error("Error updating ticket:", error);
           });
     },
     handleError(error) {
@@ -331,17 +346,6 @@ export default {
   gap: 20px;
 }
 
-.textarea {
-  width: 250px;
-  min-height: 25px;
-  padding: 5px;
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-  display: flex;
-  align-items: stretch;
-  justify-content: flex-start;
-  resize: none;
-}
 
 .textarea textarea {
   min-height: 25px;
