@@ -292,7 +292,6 @@ export default {
         }
       }
       if (this.hasCoordinates) {
-        // ticket.coordinates = {}
         if (!this.updateFields.coordinatesX) {
           this.strTicket.coordinates.x < this.MIN_INTEGER ? this.errors.coordinatesX = `Значение coordinates.x не может быть меньше возможного ${this.MIN_INTEGER}` :
               this.strTicket.coordinates.x > this.MAX_INTEGER ? this.errors.coordinatesX = `Значение coordinates.x не может быть больше возможного ${this.MAX_INTEGER}`
@@ -307,7 +306,6 @@ export default {
 
 
       if (this.hasPerson) {
-        // ticket.person = {}
         if (!this.updateFields.personHeight) {
           this.strTicket.person.height <= 0 ? this.errors.height = `Значение person.height не может быть меньше 1` :
               this.strTicket.person.height > 300 ? this.errors.height = `Значение person.height не может быть больше 300`
@@ -359,8 +357,6 @@ export default {
 .error {
   color: red;
 }
-
-/* styles.css */
 .required-asterisk {
   color: red;
   font-weight: bold;

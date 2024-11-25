@@ -105,7 +105,7 @@ export default {
       selectedStartTimeZone: '',
       localEndDateTime: '',
       selectedEndTimeZone: '',
-      timeZones: ['America/New_York', 'Europe/London', 'Asia/Tokyo'], // Пример часовых поясов
+      timeZones: ['America/New_York', 'Europe/London', 'Asia/Tokyo'],
       MAX_DOUBLE: Number.MAX_VALUE,
       MIN_DOUBLE: -Number.MAX_VALUE,
       MAX_INTEGER: 2147483647,

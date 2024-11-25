@@ -365,7 +365,7 @@ export default {
 }
 
 .table-container {
-  flex: 2 0 700px; /* Table will take 2 parts of the space, won't shrink below 700px */
+  flex: 2 0 700px;
 }
 
 table {
@@ -388,7 +388,7 @@ th {
   background-color: white;
   border: 1px solid #ddd;
   padding: 10px;
-  z-index: 10; /* Убедитесь, что всплывающие окна находятся поверх таблицы */
+  z-index: 10;
 }
 
 .btn {

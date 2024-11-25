@@ -62,7 +62,7 @@ export default {
 }
 
 .table-container {
-  flex: 2 0 700px; /* Table will take 2 parts of the space, won't shrink below 700px */
+  flex: 2 0 700px;
 }
 
 table {
