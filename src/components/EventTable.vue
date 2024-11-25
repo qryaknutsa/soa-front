@@ -93,7 +93,8 @@ export default {
             this.events = response.data;
           })
           .catch(error => {
-            console.error("Error loading events:", error);
+            const resp = this.handleError(error)
+            alert('Ошибка при загрузки мероприятий!\n' + resp);
           });
     },
     createEvent(event) {
@@ -109,6 +110,17 @@ export default {
     },
     copyTicketWithDoublePriceAndVip() {
       this.$router.push('/TMA/api/v2/booking/sell/vip');
+    },
+    handleError(error) {
+      if (error.response) {
+        const errorData = error.response.data;
+        const errorTitle = errorData.title;
+        const errorDetail = errorData.detail;
+        return `${errorTitle}\n${errorDetail}`
+      } else {
+        console.error(error);
+        return 'Произошла ошибка. Пожалуйста, попробуйте позже.';
+      }
     }
   }
 };

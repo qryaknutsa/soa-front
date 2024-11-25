@@ -8,6 +8,9 @@ import UniqueTypesPage from '../components/UniqueTypesPage.vue';
 import LessThanType from '../components/LessThanType.vue';
 import NotFound from '../components/NotFound.vue'
 import CopyTicketToVip from '../components/CopyTicketToVip.vue'
+import Enums from '../components/Enums.vue'
+import Enum from '../components/Enum.vue'
+
 
 const routes = [
     {
@@ -53,6 +56,16 @@ const routes = [
     {
         path: '/TMA/api/v2/tickets/types/unique',
         component: UniqueTypesPage,
+    },
+    {
+        path: '/TMA/api/v2/enums',
+        component: Enums,
+    },
+    {
+        path: '/TMA/api/v2/enums/:enumStr',
+        component: Enum,
+        name: 'Enum',
+        props: true
     },
     {
         path: '/TMA/api/v2/tickets/types/less/:lessType',

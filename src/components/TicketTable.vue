@@ -8,6 +8,12 @@
         <button class="btn" @click="toBooking">Перейти к сервису бронирования</button>
       </div>
 
+      <h2>Перечисления</h2>
+      <div>
+        <button class="btn" @click="toEnums">Получить значения перечислений</button>
+      </div>
+
+
 
       <h2>Создание билета</h2>
       <button class="btn" @click="openModal">Создать</button>
@@ -264,7 +270,7 @@ export default {
         if (this.filterOperators[field.name] !== null && this.filterOperators[field.name] !== 'null' && this.filterValues[field.name] !== undefined) {
           filterArray.push(`${field.name}${this.filterOperators[field.name]}${this.filterValues[field.name]}`);
         }
-        if (this.sortOptions[field.name]) {
+        if (this.sortOptions[field.name] !== null &&this.sortOptions[field.name] !== 'null') {
           sortArray.push(`${field.name}:${this.sortOptions[field.name]}`);
         }
       });
@@ -274,6 +280,8 @@ export default {
         sort: sortArray.join(',') || "",
         filter: filterArray.join(',') || "",
       };
+
+      console.log(filterArray.join(','))
       this.getTickets(params)
     },
 
@@ -304,6 +312,10 @@ export default {
       this.$router.push('/TMA/api/v2/booking');
     },
 
+    toEnums(){
+      this.$router.push('/TMA/api/v2/enums');
+    },
+
     getLessThanType() {
       try {
         this.$router.push({name: 'LessThanType', params: {lessType: this.lessType}});
@@ -312,8 +324,6 @@ export default {
         if (error.message === 'Missing required param "lessType"')
           alert('Заполните выбор типа билета!');
       }
-
-
     },
 
     createTicket(ticket) {
@@ -324,7 +334,7 @@ export default {
           })
           .catch(error => {
             const resp = this.handleError(error)
-            alert('Ошибка при создании билета!\n' + resp);
+            alert('Ошибка при создании билета!\n' + error.message);
           });
     },
     handleError(error) {

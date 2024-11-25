@@ -49,7 +49,8 @@ export default {
             this.event = response.data;
           })
           .catch(error => {
-            console.error("Error fetching event:", error);
+            const resp = this.handleError(error)
+            alert('Ошибка при загрузки мероприятий!\n' + resp);
           });
     },
     deleteEvent() {
@@ -59,9 +60,20 @@ export default {
             this.$router.push('/TMA/api/v2/booking');
           })
           .catch(error => {
-            console.error("Error deleting event:", error);
+            const resp = this.handleError(error)
+            alert('Ошибка при создании мероприятия!\n' + resp);
           });
-    },
+    },    handleError(error) {
+      if (error.response) {
+        const errorData = error.response.data;
+        const errorTitle = errorData.title;
+        const errorDetail = errorData.detail;
+        return `${errorTitle}\n${errorDetail}`
+      } else {
+        console.error(error);
+        return 'Произошла ошибка. Пожалуйста, попробуйте позже.';
+      }
+    }
   },
 };
 </script>

@@ -40,7 +40,7 @@
       <TicketUpdateForm
           :isModalOpen="isModalOpen"
           @closeModal="closeModal"
-          @ticketCreated="updateTicket"
+          @ticketUpdated="updateTicket"
       />
 
 
@@ -84,7 +84,8 @@ export default {
             this.ticket = response.data;
           })
           .catch(error => {
-            console.error("Error fetching ticket:", error);
+            const resp = this.handleError(error)
+            alert('Ошибка при загрузки билета!\n' + resp);
           });
     },
     deleteTicket() {
@@ -94,21 +95,33 @@ export default {
             this.$router.push('/');
           })
           .catch(error => {
-            console.error("Error deleting ticket:", error);
+            const resp = this.handleError(error)
+            alert('Ошибка при создании билета!\n' + resp);
           });
 
     },
     updateTicket(ticket) {
       api.ticketApiClient.patch(`/TMA/api/v2/tickets/${this.id}`, ticket)
           .then(() => {
-            alert("Ticket updated!");
-            this.getTicket(); // Обновление данных
+            alert("Билет обновлён!");
+            this.getTicket();
           })
           .catch(error => {
-            console.error("Error updating ticket:", error);
+            const resp = this.handleError(error)
+            alert('Ошибка при обновлении билета!\n' + resp);
           });
       this.getTicket();
-    },
+    },    handleError(error) {
+      if (error.response) {
+        const errorData = error.response.data;
+        const errorTitle = errorData.title;
+        const errorDetail = errorData.detail;
+        return `${errorTitle}\n${errorDetail}`
+      } else {
+        console.error(error);
+        return 'Произошла ошибка. Пожалуйста, попробуйте позже.';
+      }
+    }
   },
 };
 </script>

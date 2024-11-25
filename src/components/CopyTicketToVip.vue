@@ -77,13 +77,24 @@ export default {
             this.ticket = response.data;
           })
           .catch(error => {
-            console.error("Error fetching ticket:", error);
+            const resp = this.handleError(error)
+            alert('Ошибка при создании билета!\n' + resp);
           });
     },
-    toBooking(){
+    toBooking() {
       this.$router.push('/TMA/api/v2/booking');
     },
-
+    handleError(error) {
+      if (error.response) {
+        const errorData = error.response.data;
+        const errorTitle = errorData.title;
+        const errorDetail = errorData.detail;
+        return `${errorTitle}\n${errorDetail}`
+      } else {
+        console.error(error);
+        return 'Произошла ошибка. Пожалуйста, попробуйте позже.';
+      }
+    }
   },
 };
 </script>

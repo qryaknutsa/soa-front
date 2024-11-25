@@ -21,16 +21,27 @@ export default {
     fetchUniqueTypes() {
       api.ticketApiClient.get('/TMA/api/v2/tickets/types/unique')
           .then(response => {
-            response.data.forEach(type=>{
+            response.data.forEach(type => {
               type === "USUAL" ? this.res += "Обычный\n" : type === "CHEAP" ? this.res += "Дешевый\n" : type === "BUDGETARY" ? this.res += "Бюджетный\n" : type === "VIP" ? this.res += "VIP\n" : ""
             });
           })
           .catch(error => {
-            console.error("Error loading unique types:", error);
+            const resp = this.handleError(error)
+            alert('Ошибка при создании типов билета!\n' + resp);
           });
 
 
-    },
+    }, handleError(error) {
+      if (error.response) {
+        const errorData = error.response.data;
+        const errorTitle = errorData.title;
+        const errorDetail = errorData.detail;
+        return `${errorTitle}\n${errorDetail}`
+      } else {
+        console.error(error);
+        return 'Произошла ошибка. Пожалуйста, попробуйте позже.';
+      }
+    }
   },
 };
 </script>
