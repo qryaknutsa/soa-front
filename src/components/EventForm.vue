@@ -26,6 +26,12 @@
           <input type="number" id="discount" v-model="newEvent.discount" step="any"/>
           <div v-if="errors.discount" class="error">{{ errors.discount }}</div>
         </div>
+        <div>
+          <label for="ticketsNum"><span class="required-asterisk">*</span>Количество билетов:</label>
+          <input type="number" id="price" v-model="newEvent.ticketsNum"/>
+          <div v-if="errors.ticketsNum" class="error">{{ errors.ticketsNum }}</div>
+        </div>
+
 
 
         <h3><span class="required-asterisk">*</span>Время начала:</h3>
@@ -59,6 +65,7 @@
             </select>
             <div v-if="errors.selectedEndTimeZone" class="error">{{ errors.selectedEndTimeZone }}</div>
           </div>
+
         </div>
 
         <h3>Координаты</h3>
@@ -74,12 +81,29 @@
           <div v-if="errors.coordinatesY" class="error">{{ errors.coordinatesY }}</div>
         </div>
 
+        <h3>Локация</h3>
         <div>
-          <label for="ticketsNum"><span class="required-asterisk">*</span>Количество билетов:</label>
-          <input type="number" id="price" v-model="newEvent.ticketsNum"/>
-          <div v-if="errors.ticketsNum" class="error">{{ errors.ticketsNum }}</div>
+          <label for="locationX"><span class="required-asterisk">*</span>X:</label>
+          <input type="number" id="locationX" v-model="newEvent.location.x"/>
+          <div v-if="errors.locationX" class="error">{{ errors.locationX }}</div>
         </div>
 
+        <div>
+          <label for="locationY">Y:</label>
+          <input type="number" id="locationY" v-model="newEvent.location.y"/>
+          <div v-if="errors.locationY" class="error">{{ errors.locationY }}</div>
+        </div>
+
+        <div>
+          <label for="locationZ"><span class="required-asterisk">*</span>Z:</label>
+          <input type="number" id="locationZ" v-model="newEvent.location.z" step="any"/>
+          <div v-if="errors.locationZ" class="error">{{ errors.locationZ }}</div>
+        </div>
+
+        <div>
+          <label for="locationName">Название:</label>
+          <input type="text" id="locationName" v-model="newEvent.location.name"/>
+        </div>
 
         <button style="margin-top: 20px" type="submit">Создать</button>
       </form>
@@ -102,9 +126,9 @@ export default {
   data() {
     return {
       localStartDateTime: '',
-      selectedStartTimeZone: '',
+      selectedStartTimeZone: 'America/New_York',
       localEndDateTime: '',
-      selectedEndTimeZone: '',
+      selectedEndTimeZone: 'America/New_York',
       timeZones: ['America/New_York', 'Europe/London', 'Asia/Tokyo'],
       MAX_DOUBLE: Number.MAX_VALUE,
       MIN_DOUBLE: -Number.MAX_VALUE,
@@ -120,6 +144,12 @@ export default {
         coordinates: {
           x: 0,
           y: 0,
+        },
+        location: {
+          x: 0,
+          y: 0,
+          z: 0,
+          name: ''
         },
         startTime: '',
         endTime: '',
@@ -142,9 +172,19 @@ export default {
       this.newEvent.coordinates.x < this.MIN_INTEGER ? this.errors.coordinatesX = `Значение coordinates.x не может быть меньше возможного ${this.MIN_INTEGER}` :
           this.newEvent.coordinates.x > this.MAX_INTEGER ? this.errors.coordinatesX = `Значение coordinates.x не может быть больше возможного ${this.MAX_INTEGER}` : null
 
-
       this.newEvent.coordinates.y < this.MIN_DOUBLE ? this.errors.coordinatesY = `Значение coordinates.y не может быть меньше возможного ${this.MIN_DOUBLE}` :
           this.newEvent.coordinates.y > this.MAX_DOUBLE ? this.errors.coordinatesY = `Значение coordinates.y не может быть больше возможного ${this.MAX_DOUBLE}` : null
+
+
+      this.newEvent.location.x < this.MIN_INTEGER ? this.errors.locationX = `Значение location.x не может быть меньше возможного ${this.MIN_INTEGER}` :
+          this.newEvent.location.x > this.MAX_INTEGER ? this.errors.locationX = `Значение location.x не может быть больше возможного ${this.MAX_INTEGER}` : null
+
+      this.newEvent.location.y < this.MIN_LONG ? this.errors.locationY = `Значение location.y не может быть меньше возможного ${this.MIN_LONG}` :
+          this.newEvent.location.y > this.MAX_LONG ? this.errors.locationY = `Значение location.y не может быть больше возможного ${this.MAX_LONG}` : null
+
+      this.newEvent.location.z < this.MIN_DOUBLE ? this.errors.locationZ = `Значение location.z не может быть меньше возможного ${this.MIN_DOUBLE}` :
+          this.newEvent.location.z > this.MAX_DOUBLE ? this.errors.locationZ = `Значение location.z не может быть больше возможного ${this.MAX_DOUBLE}` : null
+
 
       this.newEvent.price <= 0 ? this.errors.price = `Значение price не может быть меньше 1` :
           this.newEvent.price > this.MAX_INTEGER ? this.errors.price = `Значение price не может быть больше возможного ${this.MAX_INTEGER}` : null
@@ -157,7 +197,7 @@ export default {
       if (this.localStartDateTime && this.selectedStartTimeZone) {
         const localDate = parseISO(this.localStartDateTime);
         const zonedDate = utcToZonedTime(localDate, this.selectedStartTimeZone);
-        this.newEvent.startTime = format(zonedDate, "yyyy-MM-dd'T'HH:mm:ss.SSSSSSX");
+        this.newEvent.startTime = format(zonedDate, "yyyy-MM-dd'T'HH:mm:ssXXX");
       } else if (this.localStartDateTime === '') {
         this.errors.localStartDateTime = 'Значение должно быть заполнено'
       } else if (this.selectedStartTimeZone === '') {
@@ -166,15 +206,17 @@ export default {
 
 
       if (this.localEndDateTime && this.selectedEndTimeZone) {
-        const localDate = parseISO(this.localStartDateTime);
-        const zonedDate = utcToZonedTime(localDate, this.selectedStartTimeZone);
-        this.newEvent.endTime = format(zonedDate, "yyyy-MM-dd'T'HH:mm:ss.SSSSSSX");
+        const localDate = parseISO(this.localEndDateTime);
+        const zonedDate = utcToZonedTime(localDate, this.selectedEndTimeZone);
+        this.newEvent.endTime = format(zonedDate, "yyyy-MM-dd'T'HH:mm:ssXXX");
       } else if (this.localEndDateTime === '') {
         this.errors.localEndDateTime = 'Значение должно быть заполнено'
       } else if (this.selectedEndTimeZone === '') {
         this.errors.selectedEndTimeZone = 'Значение должно быть заполнено'
       }
 
+      if (this.newEvent.ticketsNum <= 0) this.errors.ticketsNum = 'Значение должно быть больше 0'
+      if (this.newEvent.ticketsNum > 101) this.errors.ticketsNum = 'Значение должен быть меньше или равен 100'
       if (Object.keys(this.errors).length === 0) {
         this.$emit('eventCreated', this.newEvent);
       }

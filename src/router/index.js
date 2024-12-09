@@ -73,12 +73,18 @@ const routes = [
         name: 'LessThanType',
         props: true
     },
-    { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound }, // Для неправильных URL
+    {
+        path: '/:pathMatch(.*)',
+        name: 'NotFound',
+        component: NotFound,
+        meta: { catchAll: true }
+    }
 
 ];
 
 const router = createRouter({
     history: createWebHistory(),
+    strict: true,
     routes
 });
 

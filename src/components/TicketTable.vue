@@ -14,7 +14,6 @@
       </div>
 
 
-
       <h2>Создание билета</h2>
       <button class="btn" @click="openModal">Создать</button>
 
@@ -165,13 +164,13 @@
             <div v-if="ticket.person">{{ ticket.person.location.name }}</div>
           </td>
           <td>{{ ticket.creationDate }}</td>
+          <td>{{ ticket.eventId === 0 ? "-" : ticket.eventId }}</td>
           <td>
             <router-link :to="{ name: 'Ticket', params: { id: ticket.id } }">Перейти</router-link>
           </td>
         </tr>
         </tbody>
       </table>
-
     </div>
   </div>
 </template>
@@ -214,6 +213,7 @@ export default {
         {name: 'person.location.z', label: 'Location Z', type: 'number'},
         {name: 'person.location.name', label: 'Location Name', type: 'string'},
         {name: 'creationDate', label: 'Creation Date', type: 'string'},
+        {name: 'eventId', label: 'Event ID', type: 'number', isInteger: true},
       ],
       sortOptions: {},
       filterOperators: {},
@@ -270,7 +270,7 @@ export default {
         if (this.filterOperators[field.name] !== null && this.filterOperators[field.name] !== 'null' && this.filterValues[field.name] !== undefined) {
           filterArray.push(`${field.name}${this.filterOperators[field.name]}${this.filterValues[field.name]}`);
         }
-        if (this.sortOptions[field.name] !== null &&this.sortOptions[field.name] !== 'null') {
+        if (this.sortOptions[field.name] !== null && this.sortOptions[field.name] !== 'null') {
           sortArray.push(`${field.name}:${this.sortOptions[field.name]}`);
         }
       });
@@ -291,11 +291,12 @@ export default {
             this.tickets = response.data;
           })
           .catch(error => {
-
             if (error.status === 404) this.tickets = []
             else {
-              const resp = this.handleError(error)
-              alert('Ошибка загрузки билетов!\n' + resp);
+              if (error.status !== 404) {
+                const resp = this.handleError(error)
+                alert('Ошибка загрузки билетов!\n' + resp);
+              }
             }
           });
     },
@@ -308,11 +309,11 @@ export default {
       this.$router.push('/TMA/api/v2/tickets/types/unique');
     },
 
-    toBooking(){
+    toBooking() {
       this.$router.push('/TMA/api/v2/booking');
     },
 
-    toEnums(){
+    toEnums() {
       this.$router.push('/TMA/api/v2/enums');
     },
 
@@ -338,11 +339,19 @@ export default {
           });
     },
     handleError(error) {
-      if (error.response) {
+      if (error.response.status === 400 || error.response.status === 422) {
         const errorData = error.response.data;
         const errorTitle = errorData.title;
-        const errorDetail = errorData.detail;
-        return `${errorTitle}\n${errorDetail}`
+        let q = 'qwe'
+        for (let i = 0; i < errorData.details.length; i++) {
+          q += '\t'
+          q += errorData.details[i]
+          q += '\n'
+        }
+        return `${errorTitle}\n\nОшибки\n${q}`
+      } else if (error.response.status === 500) {
+        const errorData = error.response.data;
+        return `${errorData.title}\n${errorData.details}`
       } else {
         console.error(error);
         return 'Произошла ошибка. Пожалуйста, попробуйте позже.';

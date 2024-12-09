@@ -2,7 +2,7 @@
   <div class="ticket" v-if="event">
     <div class="ticket-details">
       <div class="ticket-card">
-        <h2>Информация о билете</h2>
+        <h2>Информация о мероприятии</h2>
         <div class="ticket-info">
           <p><strong>ID:</strong> <span>{{ event.id }}</span></p>
           <p><strong>Название:</strong> <span>{{ event.title }}</span></p>
@@ -10,17 +10,23 @@
           <p><strong>Время начала:</strong> <span>{{ event.title }}</span></p>
           <p><strong>Время окончания:</strong> <span>{{ event.title }}</span></p>
           <p><strong>Координаты:</strong> (<span>{{ event.coordinates.x }}, {{ event.coordinates.y }}</span>)</p>
+          <p><strong>Имя локации:</strong><span>{{ event.location.name }}</span></p>
+          <p><strong>Локация:</strong> (<span>{{ event.location.x }}, {{ event.location.y }}, {{ event.location.z }}</span>)</p>
           <p><strong>Цена:</strong> <span>{{ event.price }}</span></p>
           <p><strong>Скидка:</strong><span>{{ event.discount }}</span></p>
           <p><strong>Количество билетов:</strong><span>{{ event.ticketsNum }}</span></p>
         </div>
       </div>
     </div>
+    <div style="padding: 10px">
+      <button class="btn" @click="toBooking">Вернуться</button>
+    </div>
+
     <div class="ticket-actions">
       <button @click="deleteEvent">Удалить</button>
     </div>
   </div>
-  <div v-else>Загрузка...</div>
+  <div v-else>Мероприятия нет</div>
 </template>
 
 <script>
@@ -43,14 +49,19 @@ export default {
     this.getEvent();
   },
   methods: {
+    toBooking() {
+      this.$router.push('/TMA/api/v2/booking');
+    },
     getEvent() {
       api.bookingApiClient.get(`/TMA/api/v2/booking/event/${this.id}`)
           .then(response => {
             this.event = response.data;
           })
           .catch(error => {
-            const resp = this.handleError(error)
-            alert('Ошибка при загрузки мероприятий!\n' + resp);
+            if(error.status !== 404) {
+              const resp = this.handleError(error)
+              alert('Ошибка при загрузки мероприятий!\n' + resp);
+            }
           });
     },
     deleteEvent() {
@@ -69,6 +80,9 @@ export default {
         const errorTitle = errorData.title;
         const errorDetail = errorData.detail;
         return `${errorTitle}\n${errorDetail}`
+      } else if (error.response.status === 500) {
+        const errorData = error.response.data;
+        return `${errorData.title}\n${errorData.details}`
       } else {
         console.error(error);
         return 'Произошла ошибка. Пожалуйста, попробуйте позже.';

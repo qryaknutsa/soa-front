@@ -2,6 +2,9 @@
   <div>
     <h2>Все скидки</h2>
     <p>{{ discounts }}</p>
+    <div>
+      <button class="btn" @click="toTicket">Вернуться</button>
+    </div>
   </div>
 </template>
 
@@ -18,6 +21,9 @@ export default {
     this.fetchDiscounts();
   },
   methods: {
+    toTicket() {
+      this.$router.push('/TMA/api/v2/tickets');
+    },
     fetchDiscounts() {
       api.ticketApiClient.get('/TMA/api/v2/tickets/discounts')
           .then(response => {
@@ -33,6 +39,9 @@ export default {
         const errorTitle = errorData.title;
         const errorDetail = errorData.detail;
         return `${errorTitle}\n${errorDetail}`
+      } else if (error.response.status === 500) {
+        const errorData = error.response.data;
+        return `${errorData.title}\n${errorData.details}`
       } else {
         console.error(error);
         return 'Произошла ошибка. Пожалуйста, попробуйте позже.';

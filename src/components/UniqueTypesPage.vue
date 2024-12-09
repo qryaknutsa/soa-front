@@ -2,6 +2,9 @@
   <div>
     <h2>Уникальные типы билетов</h2>
     <p>{{ res }}</p>
+    <div>
+      <button class="btn" @click="toTicket">Вернуться</button>
+    </div>
   </div>
 </template>
 
@@ -18,6 +21,9 @@ export default {
     this.fetchUniqueTypes();
   },
   methods: {
+    toTicket() {
+      this.$router.push('/TMA/api/v2/tickets');
+    },
     fetchUniqueTypes() {
       api.ticketApiClient.get('/TMA/api/v2/tickets/types/unique')
           .then(response => {
@@ -37,6 +43,9 @@ export default {
         const errorTitle = errorData.title;
         const errorDetail = errorData.detail;
         return `${errorTitle}\n${errorDetail}`
+      } else if (error.response.status === 500) {
+        const errorData = error.response.data;
+        return `${errorData.title}\n${errorData.details}`
       } else {
         console.error(error);
         return 'Произошла ошибка. Пожалуйста, попробуйте позже.';

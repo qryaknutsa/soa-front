@@ -4,7 +4,7 @@
       <div class="ticket-card">
         <h2>Сервис бронирования</h2>
         <div>
-          <button class="btn" @click="toBooking">Перейти к сервису бронирования</button>
+          <button class="btn" @click="toBooking">Вернуться</button>
         </div>
 
 
@@ -85,7 +85,12 @@ export default {
       this.$router.push('/TMA/api/v2/booking');
     },
     handleError(error) {
-      if (error.response) {
+      if (error.response.status === 422 || error.response.status === 400) {
+        const errorData = error.response.data;
+        const errorTitle = errorData.title;
+        const errorDetail = errorData.details;
+        return `${errorTitle}\n${errorDetail}`
+      } else if(error.response.status === 500 || error.response.status === 503){
         const errorData = error.response.data;
         const errorTitle = errorData.title;
         const errorDetail = errorData.detail;

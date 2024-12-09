@@ -8,7 +8,7 @@
       </div>
 
       <h2>Создание мероприятия</h2>
-      <button class="btn" @click="openModal">Создать</button>
+      <button class="btn" @click="openModal">Создать мероприятие</button>
 
       <EventForm
           :isModalOpen="isModalOpen"
@@ -18,13 +18,13 @@
 
       <h2>Создание копию VIP билета с удвоенной ценой</h2>
       <div>
-        <button class="btn" @click="copyTicketWithDoublePriceAndVip">Создать</button>
+        <button class="btn" @click="copyTicketWithDoublePriceAndVip">Создать билет</button>
       </div>
 
       <h2>Мероприятия</h2>
-<!--      <div>-->
-<!--        <button class="btn" @click="fetchEvents">Загрузить</button>-->
-<!--      </div>-->
+      <!--      <div>-->
+      <!--        <button class="btn" @click="fetchEvents">Загрузить</button>-->
+      <!--      </div>-->
       <table border="1">
         <thead>
         <tr>
@@ -34,6 +34,8 @@
           <th>Время начала</th>
           <th>Время окончания</th>
           <th>Координаты</th>
+          <th>Имя локации</th>
+          <th>Локация</th>
           <th>Цена</th>
           <th>Скидка</th>
           <th>Количество билетов</th>
@@ -48,6 +50,8 @@
           <td>{{ event.startTime }}</td>
           <td>{{ event.endTime }}</td>
           <td>({{ event.coordinates.x }}, {{ event.coordinates.y }})</td>
+          <td>{{ event.location.name }}</td>
+          <td>({{ event.location.x }}, {{ event.location.y }}, {{ event.location.z }})</td>
           <td>{{ event.price }}</td>
           <td>{{ event.discount }}</td>
           <td>{{ event.ticketsNum }}</td>
@@ -93,8 +97,10 @@ export default {
             this.events = response.data;
           })
           .catch(error => {
-            const resp = this.handleError(error)
-            alert('Ошибка при загрузки мероприятий!\n' + resp);
+            if (error.status !== 404) {
+              const resp = this.handleError(error)
+              alert('Ошибка при загрузки мероприятий!\n' + resp);
+            }
           });
     },
     createEvent(event) {
@@ -105,18 +111,25 @@ export default {
           })
           .catch(error => {
             const resp = this.handleError(error)
-            alert('Ошибка при создании мероприятия!\n' + resp);
+            alert('Ошибка при создании мероприятия!\n\n' + resp);
           });
     },
     copyTicketWithDoublePriceAndVip() {
       this.$router.push('/TMA/api/v2/booking/sell/vip');
     },
     handleError(error) {
-      if (error.response) {
+      if (error.status === 422) {
         const errorData = error.response.data;
-        const errorTitle = errorData.title;
-        const errorDetail = errorData.detail;
-        return `${errorTitle}\n${errorDetail}`
+        let q = ''
+        for (let i = 0; i < errorData.details.length; i++) {
+          q += '\t'
+          q += errorData.details[i]
+          q += '\n'
+        }
+        return `${errorData.title}\n\nОшибки\n${q}`
+      } else if (error.status === 503  || error.response.status === 500) {
+        const errorData = error.response.data;
+        return `${errorData.title}\n${errorData.details}`
       } else {
         console.error(error);
         return 'Произошла ошибка. Пожалуйста, попробуйте позже.';

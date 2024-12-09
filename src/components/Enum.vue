@@ -5,6 +5,9 @@
         <h2>{{ enumName }}</h2>
         <p>{{ this.res }}</p>
       </div>
+      <div style="padding: 50px">
+        <button class="btn" @click="toTicket">Вернуться</button>
+      </div>
     </div>
   </div>
 
@@ -33,6 +36,9 @@ export default {
     this.getEnum()
   },
   methods: {
+    toTicket() {
+      this.$router.push('/TMA/api/v2/enums');
+    },
     getEnum() {
       api.ticketApiClient.get(`/TMA/api/v2/enums/${this.enumStr}`)
           .then(response => {
@@ -71,6 +77,9 @@ export default {
         const errorTitle = errorData.title;
         const errorDetail = errorData.detail;
         return `${errorTitle}\n${errorDetail}`
+      } else if (error.response.status === 500) {
+        const errorData = error.response.data;
+        return `${errorData.title}\n${errorData.details}`
       } else {
         console.error(error);
         return 'Произошла ошибка. Пожалуйста, попробуйте позже.';

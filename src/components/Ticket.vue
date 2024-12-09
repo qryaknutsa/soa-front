@@ -22,7 +22,9 @@
             <li><strong>Цвет волос:</strong> {{ ticket.person.hairColor }}</li>
             <li><strong>Национальность:</strong> {{ ticket.person.nationality }}</li>
             <li><strong>Имя локации:</strong>{{ ticket.person.location.name }}</li>
-            <li><strong>Координаты локации:</strong> (<span>{{ ticket.person.location.x }}, {{ ticket.person.location.y }}, {{ ticket.person.location.z }}</span>)
+            <li><strong>Координаты локации:</strong> (<span>{{ ticket.person.location.x }}, {{
+                ticket.person.location.y
+              }}, {{ ticket.person.location.z }}</span>)
             </li>
           </ul>
         </div>
@@ -32,6 +34,9 @@
           <p>Владельца нет.</p>
         </div>
       </div>
+    </div>
+    <div style="padding: 10px">
+      <button class="btn" @click="toTicket">Вернуться</button>
     </div>
     <div class="ticket-actions">
       <button @click="deleteTicket">Удалить</button>
@@ -46,7 +51,7 @@
 
     </div>
   </div>
-  <div v-else>Loading...</div>
+  <div v-else>Билета нет</div>
 </template>
 
 <script>
@@ -72,6 +77,9 @@ export default {
     this.getTicket();
   },
   methods: {
+    toTicket() {
+      this.$router.push('/TMA/api/v2/tickets');
+    },
     openModal() {
       this.isModalOpen = true;
     },
@@ -84,8 +92,10 @@ export default {
             this.ticket = response.data;
           })
           .catch(error => {
-            const resp = this.handleError(error)
-            alert('Ошибка при загрузки билета!\n' + resp);
+            if (error.status !== 404) {
+              const resp = this.handleError(error)
+              alert('Ошибка при загрузки билета!\n' + resp);
+            }
           });
     },
     deleteTicket() {
@@ -111,12 +121,20 @@ export default {
             alert('Ошибка при обновлении билета!\n' + resp);
           });
       this.getTicket();
-    },    handleError(error) {
-      if (error.response) {
+    }, handleError(error) {
+      if (error.response.status === 400 || error.response.status === 422) {
         const errorData = error.response.data;
         const errorTitle = errorData.title;
-        const errorDetail = errorData.detail;
-        return `${errorTitle}\n${errorDetail}`
+        let q = ''
+        for (let i = 0; i < errorData.details.length; i++) {
+          q += '\t'
+          q += errorData.details[i]
+          q += '\n'
+        }
+        return `${errorTitle}\n\nОшибки\n${q}`
+      } else if (error.response.status === 500) {
+        const errorData = error.response.data;
+        return `${errorData.title}\n${errorData.details}`
       } else {
         console.error(error);
         return 'Произошла ошибка. Пожалуйста, попробуйте позже.';

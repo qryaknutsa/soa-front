@@ -13,6 +13,11 @@
       <div>
         <button class="btn" @click="getTypes">Получить типы билетов</button>
       </div>
+
+
+      <div style="padding: 50px">
+        <button class="btn" @click="toTicket">Вернуться</button>
+      </div>
     </div>
   </div>
 </template>
@@ -31,6 +36,9 @@ export default {
     }
   },
   methods: {
+    toTicket() {
+      this.$router.push('/TMA/api/v2/tickets');
+    },
     getСountries() {
       this.$router.push({name: 'Enum', params: {enumStr: 'countries'}});
     },
