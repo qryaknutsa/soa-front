@@ -1,7 +1,7 @@
 <template>
   <div v-if="isModalOpen" class="modal-overlay" @click.self="closeModal">
     <div class="modal-content">
-      <h2>Create New Ticket</h2>
+      <h2>Обновить билет</h2>
       <form @submit.prevent="updateTicket">
         <div>
           <input type="checkbox" id="hasDefault" style="margin-top: 20px" v-model="hasDefault"> Изменить основные данные
@@ -135,7 +135,7 @@
         </div>
 
         <div>
-          <input type="checkbox" id="hasLocation" style="margin-top: 20px" v-model="hasLocation"> Есть местоположение
+          <input type="checkbox" id="hasLocation" style="margin-top: 20px" v-model="hasLocation"> Изменить местоположение
           <div v-if="hasLocation">
             <h3>Местоположение</h3>
             <div>

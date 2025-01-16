@@ -24,11 +24,9 @@
         <div>
           <label for="refundableType">Возвратный:</label>
           <select id="refundableType" v-model="refundableType">
-            <option value="ANY" selected>Не выбрано</option>
             <option value="TRUE">Да</option>
             <option value="FALSE">Нет</option>
           </select>
-          <!--        <input type="checkbox" id="refundable" v-model="newTicket.refundable"/>-->
         </div>
 
         <div>
@@ -150,7 +148,7 @@ export default {
       MIN_LONG: Number.MIN_SAFE_INTEGER,
 
       hasPerson: true,
-      refundableType: 'ANY',
+      refundableType: 'FALSE',
 
       newTicket: {
         name: '',
@@ -204,9 +202,8 @@ export default {
 
       if (this.newTicket.type === 'ANY') this.newTicket.type = null
 
-      this.refundableType === 'ANY' ? this.newTicket.refundable = null :
-          this.refundableType === 'TRUE' ? this.newTicket.refundable = true :
-              this.refundableType === 'FALSE' ? this.newTicket.refundable = false : null
+      this.refundableType === 'TRUE' ? this.newTicket.refundable = true :
+          this.refundableType === 'FALSE' ? this.newTicket.refundable = false : null
 
       if (this.hasPerson) {
         this.newTicket.person.height <= 0 ? this.errors.height = `Значение person.height не может быть меньше 1` :

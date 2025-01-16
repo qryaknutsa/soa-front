@@ -129,7 +129,7 @@ export default {
       selectedStartTimeZone: 'America/New_York',
       localEndDateTime: '',
       selectedEndTimeZone: 'America/New_York',
-      timeZones: ['America/New_York', 'Europe/London', 'Asia/Tokyo'],
+      timeZones: ['America/New_York', 'Europe/London', 'Asia/Tokyo', 'Europe/Moscow'],
       MAX_DOUBLE: Number.MAX_VALUE,
       MIN_DOUBLE: -Number.MAX_VALUE,
       MAX_INTEGER: 2147483647,
@@ -208,6 +208,8 @@ export default {
       if (this.localEndDateTime && this.selectedEndTimeZone) {
         const localDate = parseISO(this.localEndDateTime);
         const zonedDate = utcToZonedTime(localDate, this.selectedEndTimeZone);
+        console.log(this.selectedEndTimeZone)
+        console.log(zonedDate)
         this.newEvent.endTime = format(zonedDate, "yyyy-MM-dd'T'HH:mm:ssXXX");
       } else if (this.localEndDateTime === '') {
         this.errors.localEndDateTime = 'Значение должно быть заполнено'
@@ -216,7 +218,6 @@ export default {
       }
 
       if (this.newEvent.ticketsNum <= 0) this.errors.ticketsNum = 'Значение должно быть больше 0'
-      if (this.newEvent.ticketsNum > 101) this.errors.ticketsNum = 'Значение должен быть меньше или равен 100'
       if (Object.keys(this.errors).length === 0) {
         this.$emit('eventCreated', this.newEvent);
       }

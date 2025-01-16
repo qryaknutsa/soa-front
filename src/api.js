@@ -1,22 +1,35 @@
 import axios from 'axios';
+import keycloak from './keycloak'; // Импортируйте общий экземпляр Keycloak
+
+const attachTokenToRequest = async (config) => {
+    if (keycloak.token) {
+        config.headers.Authorization = `Bearer ${keycloak.token}`;
+    } else {
+        console.warn('Keycloak token is missing!');
+    }
+    return config;
+};
 
 const ticketApiClient = axios.create({
-    baseURL: 'http://localhost:8080/ticketservicepayara',
+    baseURL: 'http://localhost:65462',
     headers: {
         'Content-Type': 'application/json',
     },
     timeout: 10000,
+    withCredentials: true
 });
 
-const bookingApiClient = axios.create({
-    baseURL: 'http://localhost:8080/bookingServicePayara',
-    headers: {
-        'Content-Type': 'application/json',
+ticketApiClient.interceptors.request.use(
+    async (config) => {
+        try {
+            return await attachTokenToRequest(config);
+        } catch (error) {
+            console.error('Error attaching token:', error);
+            throw error;
+        }
     },
-    timeout: 10000,
-});
-
-
+    (error) => Promise.reject(error)
+);
 
 ticketApiClient.interceptors.response.use(
     response => response,
@@ -24,6 +37,20 @@ ticketApiClient.interceptors.response.use(
         console.error('API Error:', error);
         return Promise.reject(error);
     }
+);
+
+
+const bookingApiClient = axios.create({
+    baseURL: 'http://localhost:8090/bookingService',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    timeout: 10000,
+});
+
+bookingApiClient.interceptors.request.use(
+    async (config) => attachTokenToRequest(config),
+    (error) => Promise.reject(error)
 );
 
 bookingApiClient.interceptors.response.use(
@@ -34,4 +61,4 @@ bookingApiClient.interceptors.response.use(
     }
 );
 
-export default {ticketApiClient, bookingApiClient};
+export default { ticketApiClient, bookingApiClient, keycloak };

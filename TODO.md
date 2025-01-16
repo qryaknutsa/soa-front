@@ -7,8 +7,7 @@
 
 
 ### Ошибки
-- [x] 400
-  - [x] если неверное условие фильтрации
+- [ ] Изменить вид ошибки, когда пытаешься удалить евент, который начался, но не закончился
 
 
 ### Тестирование
@@ -20,29 +19,7 @@
 - [x] не работает сортировка и фильтрация creationDate
 
 ### POST
-- [ ] проверить валидацию
-  - [ ] Методы:
-    - [ ] экстремальные значения
-    - [ ] неверные значения
-    - [ ] неверный тип параметра
-    - [ ] правильное ли дефолтное значение?
-  - [ ] Поля:
-    - [ ] id
-    - [ ] name
-    - [ ] coordinates.x
-    - [ ] coordinates.y
-    - [ ] price
-    - [ ] discount
-    - [ ] refundable
-    - [ ] type
-    - [ ] person.height
-    - [ ] person.eyeColor
-    - [ ] person.hairColor
-    - [ ] person.nationality
-    - [ ] person.location.x
-    - [ ] person.location.y
-    - [ ] person.location.z
-    - [ ] person.location.name
+
 
 
 ## /tickets/{id}
