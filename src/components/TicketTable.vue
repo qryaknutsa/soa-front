@@ -334,8 +334,8 @@ export default {
             this.fetchTickets()
           })
           .catch(error => {
-            const resp = this.handleError(error)
-            alert('Ошибка при создании билета!\n' + error.message);
+              const resp = this.handleError(error)
+              alert('Ошибка при создании билета!\n' + resp);
           });
     },
     handleError(error) {
@@ -349,9 +349,9 @@ export default {
           q += '\n'
         }
         return `${errorTitle}\n\nОшибки\n${q}`
-      } else if (error.response.status === 500) {
+      } else if (error.response.status === 500 || error.response.status === 403) {
         const errorData = error.response.data;
-        return `${errorData.title}\n${errorData.details}`
+        return `${errorData.title}\n${errorData.detail}`
       } else {
         console.error(error);
         return 'Произошла ошибка. Пожалуйста, попробуйте позже.';

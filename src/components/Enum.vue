@@ -16,8 +16,6 @@
 
 <script>
 
-import api from "@/api.js";
-
 export default {
   name: 'Enum',
   props: {
@@ -29,7 +27,10 @@ export default {
   data() {
     return {
       enumName: '',
-      res: ''
+      res: '',
+      response:{
+        data : ""
+      }
     }
   },
   created() {
@@ -40,38 +41,33 @@ export default {
       this.$router.push('/TMA/api/v2/enums');
     },
     getEnum() {
-      api.ticketApiClient.get(`/TMA/api/v2/enums/${this.enumStr}`)
-          .then(response => {
-            if (this.enumStr === 'ticket-types') {
-              this.enumName = 'Список типов билетов'
-              response.data.forEach(type => {
-                type === "USUAL" ? this.res += "Обычный, " : type === "CHEAP" ? this.res += "Дешевый, " : type === "BUDGETARY" ? this.res += "Бюджетный, " : type === "VIP" ? this.res += "VIP" : ""
-              });
-            }
-            else if (this.enumStr === 'countries') {
-              this.enumName = 'Список стран'
-              response.data.forEach(type => {
-                type === "NORTH_KOREA" ? this.res += "Северная Корея, " : type === "CHINA" ? this.res += "Китай\n" : type === "JAPAN" ? this.res += "Япония, " : ""
-              });
-            }
-            else if (this.enumStr === 'eye-colors') {
-              this.enumName = 'Список цвет глаз'
-              response.data.forEach(type => {
-                type === "GREEN" ? this.res += "Зеленый, " : type === "RED" ? this.res += "Красный, " : type === "BLUE" ? this.res += "Синий" : ""
-              });
-            }
-            else if (this.enumStr === 'hair-colors') {
-              this.enumName = 'Список цвет волос'
-              response.data.forEach(type => {
-                type === "BLACK" ? this.res += "Черный, " : type === "RED" ? this.res += "Красный, " : type === "BLUE" ? this.res += "Синий, " : type === "ORANGE" ? this.res += "Рыжий, " : type === "WHITE" ? this.res += "Белый" : ""
-              });
-            }
-          })
-          .catch(error => {
-              const resp = this.handleError(error)
-              alert('Ошибка при загрузки значения перечисления!\n' + resp);
-          });
-    },    handleError(error) {
+      if (this.enumStr === 'ticket-types') {
+        this.enumName = 'Список типов билетов'
+        this.res = "Обычный, Дешевый, Бюджетный, VIP"
+        // this.response.data.forEach(type => {
+        //   type === "USUAL" ? this.res += "Обычный, " : type === "CHEAP" ? this.res += "Дешевый, " : type === "BUDGETARY" ? this.res += "Бюджетный, " : type === "VIP" ? this.res += "VIP" : ""
+        // });
+      } else if (this.enumStr === 'countries') {
+        this.enumName = 'Список стран'
+        this.res = "Северная Корея, Китай, Япония"
+        // this.response.data.forEach(type => {
+        //   type === "NORTH_KOREA" ? this.res += "Северная Корея, " : type === "CHINA" ? this.res += "Китай\n" : type === "JAPAN" ? this.res += "Япония, " : ""
+        // });
+      } else if (this.enumStr === 'eye-colors') {
+        this.enumName = 'Список цвет глаз'
+        this.res = "Зеленый, Красный, Синий"
+        // this.response.data.forEach(type => {
+        //   type === "GREEN" ? this.res += "Зеленый, " : type === "RED" ? this.res += "Красный, " : type === "BLUE" ? this.res += "Синий" : ""
+        // });
+      } else if (this.enumStr === 'hair-colors') {
+        this.enumName = 'Список цвет волос'
+        this.res = "Черный, Красный, Синий, Рыжий, Белый"
+        // this.response.data.forEach(type => {
+        //   type === "BLACK" ? this.res += "Черный, " : type === "RED" ? this.res += "Красный, " : type === "BLUE" ? this.res += "Синий, " : type === "ORANGE" ? this.res += "Рыжий, " : type === "WHITE" ? this.res += "Белый" : ""
+        // });
+      }
+    },
+    handleError(error) {
       if (error.response) {
         const errorData = error.response.data;
         const errorTitle = errorData.title;

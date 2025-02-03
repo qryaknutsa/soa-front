@@ -11,7 +11,7 @@ const attachTokenToRequest = async (config) => {
 };
 
 const ticketApiClient = axios.create({
-    baseURL: 'http://localhost:65462',
+    baseURL: 'http://localhost:80',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -41,7 +41,7 @@ ticketApiClient.interceptors.response.use(
 
 
 const bookingApiClient = axios.create({
-    baseURL: 'http://localhost:8090/bookingService',
+    baseURL: 'http://localhost:90/bookingService',
     headers: {
         'Content-Type': 'application/json',
     },

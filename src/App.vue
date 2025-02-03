@@ -1,12 +1,21 @@
 <template>
   <div id="app">
+    <button @click="logout" class="logout-button">Выйти</button>
     <router-view />
   </div>
 </template>
 
 <script>
+import keycloak from './keycloak';
+
 export default {
-  name: 'App'
+  name: 'App',
+  methods: {
+    logout() {
+      keycloak.logout();
+      console.log('Выполнен выход');
+    }
+  }
 };
 </script>
 
@@ -18,5 +27,9 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.logout-button:hover {
+  background-color: #cc0000;
 }
 </style>

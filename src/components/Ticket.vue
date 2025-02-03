@@ -121,20 +121,20 @@ export default {
             alert('Ошибка при обновлении билета!\n' + resp);
           });
       this.getTicket();
-    }, handleError(error) {
+    },     handleError(error) {
       if (error.response.status === 400 || error.response.status === 422) {
         const errorData = error.response.data;
         const errorTitle = errorData.title;
-        let q = ''
+        let q = 'qwe'
         for (let i = 0; i < errorData.details.length; i++) {
           q += '\t'
           q += errorData.details[i]
           q += '\n'
         }
         return `${errorTitle}\n\nОшибки\n${q}`
-      } else if (error.response.status === 500) {
+      } else if (error.response.status === 500 || error.response.status === 403) {
         const errorData = error.response.data;
-        return `${errorData.title}\n${errorData.details}`
+        return `${errorData.title}\n${errorData.detail}`
       } else {
         console.error(error);
         return 'Произошла ошибка. Пожалуйста, попробуйте позже.';

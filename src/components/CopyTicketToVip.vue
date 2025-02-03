@@ -90,7 +90,10 @@ export default {
         const errorTitle = errorData.title;
         const errorDetail = errorData.details;
         return `${errorTitle}\n${errorDetail}`
-      } else if(error.response.status === 500 || error.response.status === 503){
+      } else if (error.status === 403) {
+        const errorData = error.response.data;
+        return `Ошибка авторизации\nНедостаточно прав для выполнения этого действия`
+      } else if (error.response.status === 500 || error.response.status === 503) {
         const errorData = error.response.data;
         const errorTitle = errorData.title;
         const errorDetail = errorData.detail;

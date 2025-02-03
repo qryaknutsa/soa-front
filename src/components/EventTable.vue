@@ -127,7 +127,10 @@ export default {
           q += '\n'
         }
         return `${errorData.title}\n\nОшибки\n${q}`
-      } else if (error.status === 503  || error.response.status === 500) {
+      } else if (error.status === 403) {
+        const errorData = error.response.data;
+        return `Ошибка авторизации\nНедостаточно прав для выполнения этого действия`
+      } else if (error.status === 503 || error.response.status === 500) {
         const errorData = error.response.data;
         return `${errorData.title}\n${errorData.details}`
       } else {
