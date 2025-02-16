@@ -9,7 +9,7 @@ const ticketApiClient = axios.create({
 });
 
 const bookingApiClient = axios.create({
-    baseURL: 'http://localhost:8080/bookingservicepayara',
+    baseURL: 'http://localhost:8100',
     headers: {
         'Content-Type': 'application/json',
     },

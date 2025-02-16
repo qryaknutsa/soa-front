@@ -136,7 +136,7 @@
           <td>{{ ticket.price }}</td>
           <td>{{ ticket.discount }}</td>
           <td>{{ ticket.refundable ? "Да" : ticket.refundable === null ? "" : "Нет" }}</td>
-          <td>{{ ticket.type }}</td>
+          <td>{{ ticket.ticketType }}</td>
           <td>
             <div v-if="ticket.person">{{ ticket.person.id }}</div>
           </td>
@@ -203,7 +203,7 @@ export default {
         {name: 'price', label: 'Price', type: 'number'},
         {name: 'discount', label: 'Discount', type: 'number', isInteger: true},
         {name: 'refundable', label: 'Refundable', type: 'enum'},
-        {name: 'type', label: 'Ticket Type', type: 'enum'},
+        {name: 'ticketType', label: 'Ticket Type', type: 'enum'},
         {name: 'person.id', label: 'Person ID', type: 'number', isInteger: true},
         {name: 'person.height', label: 'Person Height', type: 'number', isInteger: true},
         {name: 'person.eyeColor', label: 'Person Eye Color', type: 'enum'},
@@ -291,7 +291,6 @@ export default {
             this.tickets = response.data;
           })
           .catch(error => {
-
             if (error.status === 404) this.tickets = []
             else {
               const resp = this.handleError(error)
