@@ -165,6 +165,7 @@
             <div v-if="ticket.person">{{ ticket.person.location.name }}</div>
           </td>
           <td>{{ ticket.creationDate }}</td>
+          <td>{{ ticket.eventId === 0 ? "-" : ticket.eventId }}</td>
           <td>
             <router-link :to="{ name: 'Ticket', params: { id: ticket.id } }">Перейти</router-link>
           </td>
@@ -214,6 +215,7 @@ export default {
         {name: 'person.location.z', label: 'Location Z', type: 'number'},
         {name: 'person.location.name', label: 'Location Name', type: 'string'},
         {name: 'creationDate', label: 'Creation Date', type: 'string'},
+        {name: 'eventId', label: 'Event ID', type: 'number', isInteger: true},
       ],
       sortOptions: {},
       filterOperators: {},

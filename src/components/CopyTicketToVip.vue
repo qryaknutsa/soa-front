@@ -87,8 +87,8 @@ export default {
     handleError(error) {
       if (error.response) {
         const errorData = error.response.data;
-        const errorTitle = errorData.title;
-        const errorDetail = errorData.detail;
+        const errorTitle = errorData.status;
+        const errorDetail = errorData.message;
         return `${errorTitle}\n${errorDetail}`
       } else {
         console.error(error);
